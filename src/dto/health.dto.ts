@@ -1,4 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export default class HealthDto {
+  @ApiProperty()
   public status: string;
 
   constructor(status: string) {

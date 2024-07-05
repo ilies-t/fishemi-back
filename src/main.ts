@@ -1,10 +1,15 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './config/app.module';
 import globalConfig from './config/global.config';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import helmet from 'helmet';
 import { AuthGuard } from './guard/auth.guard';
 import { JwtAccessService } from './service/jwt/jwt-access.service';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +18,9 @@ async function bootstrap() {
   app.useGlobalGuards(
     new AuthGuard(app.get(Reflector), new JwtAccessService()),
   );
+
+  // logger
+  app.useLogger(new Logger());
 
   // input validation and dto transformation
   app.useGlobalPipes(
@@ -25,7 +33,7 @@ async function bootstrap() {
 
   // cors and security
   app.enableCors({
-    origin: [globalConfig().allowOrigin],
+    origin: globalConfig().allowOrigin,
     methods: ['OPTIONS', 'GET', 'PUT', 'POST', 'DELETE', 'PATCH'],
     allowedHeaders: [
       'Content-Type',
@@ -39,8 +47,19 @@ async function bootstrap() {
   });
   app.use(helmet());
 
+  // OpenAPI documentation (Swagger)
+  const options = new DocumentBuilder()
+    .setTitle('Fishemi API')
+    .setDescription('The Fishemi API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('swagger', app, document);
+
   await app.listen(globalConfig().port);
 }
+
 bootstrap().then(() =>
   console.log(`
   __ _     _                    _                    
@@ -48,6 +67,5 @@ bootstrap().then(() =>
 | |_| / __| '_ \\ / _ \\ '_ \` _ \\| | | '__| | | | '_ \\ 
 |  _| \\__ \\ | | |  __/ | | | | | | | |  | |_| | | | |
 |_| |_|___/_| |_|\\___|_| |_| |_|_| |_|   \\__,_|_| |_|
-
 `),
 );
