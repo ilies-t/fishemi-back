@@ -9,7 +9,7 @@ export class JWTUtil {
   constructor(secret: string, expiresIn: string) {
     this.jwt = new JwtService({
       signOptions: {
-        algorithm: 'ES256',
+        algorithm: 'HS512',
         expiresIn: expiresIn,
       },
       secret: secret,
