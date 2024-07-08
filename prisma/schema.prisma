@@ -14,83 +14,86 @@ datasource db {
 }
 
 model company {
-  id          String   @id @default(uuid())
-  created_at  DateTime  @default(now())
-  name        String
+  id             String          @id @default(uuid())
+  created_at     DateTime        @default(now())
+  name           String
   admin_accounts admin_account[]
-  lists        list[]
-  campaigns    campaign[]
+  lists          list[]
+  campaigns      campaign[]
+  employee       employee[]
 }
 
 model admin_account {
-  id               String    @id @default(uuid())
-  created_at       DateTime  @default(now())
-  email            String    @unique
-  full_name        String
-  otp_code         String?
+  id                  String    @id @default(uuid())
+  created_at          DateTime  @default(now())
+  email               String    @unique
+  full_name           String
+  otp_code            String?
   otp_code_expiration DateTime?
-  roles            String
-  company          company   @relation(fields: [company_id], references: [id])
-  company_id       String
-  is_enabled       Boolean   @default(true)
+  roles               String
+  company             company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company_id          String
+  is_enabled          Boolean   @default(true)
 }
 
 model employee {
-  id          String   @id @default(uuid())
-  created_at  DateTime  @default(now())
-  email       String
-  full_name   String
+  id             String          @id @default(uuid())
+  created_at     DateTime        @default(now())
+  email          String
+  full_name      String
+  company        company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company_id     String
   employee_lists employee_list[]
-  events      event[]
+  events         event[]
 }
 
 model list {
-  id          String   @id @default(uuid())
-  created_at  DateTime  @default(now())
-  name        String
-  company     company   @relation(fields: [company_id], references: [id])
-  company_id  String
+  id             String          @id @default(uuid())
+  created_at     DateTime        @default(now())
+  name           String
+  company        company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company_id     String
   employee_lists employee_list[]
   campaign_lists campaign_list[]
 }
 
 model employee_list {
-  id         String   @id @default(uuid())
-  created_at DateTime  @default(now())
-  employee   employee  @relation(fields: [employee_id], references: [id])
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  employee    employee @relation(fields: [employee_id], references: [id], onDelete: Cascade)
   employee_id String
-  list       list      @relation(fields: [list_id], references: [id])
-  list_id    String
+  list        list     @relation(fields: [list_id], references: [id], onDelete: Cascade)
+  list_id     String
 }
 
 model campaign {
-  id                  String    @id @default(uuid())
-  created_at         DateTime  @default(now())
-  name               String
-  company     company   @relation(fields: [company_id], references: [id])
-  company_id         String
-  payment_stripe_id   String?
+  id                      String          @id @default(uuid())
+  created_at              DateTime        @default(now())
+  name                    String
+  company                 company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  company_id              String
+  payment_stripe_id       String?
   amount_paid_without_vat Decimal
-  payment_status      String
-  campaign_lists      campaign_list[]
-  events             event[]
+  payment_status          String
+  campaign_lists          campaign_list[]
+  events                  event[]
 }
 
 model campaign_list {
-  id         String   @id @default(uuid())
-  created_at DateTime  @default(now())
-  campaign   campaign  @relation(fields: [campaign_id], references: [id])
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  campaign    campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
   campaign_id String
-  list       list      @relation(fields: [list_id], references: [id])
-  list_id    String
+  list        list     @relation(fields: [list_id], references: [id], onDelete: Cascade)
+  list_id     String
 }
 
 model event {
   id          String   @id @default(uuid())
-  created_at  DateTime  @default(now())
+  created_at  DateTime @default(now())
   event_type  String
   user_id     String
   campaign_id String
-  user        employee  @relation(fields: [user_id], references: [id])
-  campaign    campaign  @relation(fields: [campaign_id], references: [id])
+  user        employee @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  campaign    campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
 }
