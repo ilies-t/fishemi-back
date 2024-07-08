@@ -64,9 +64,9 @@ export class AdminAccountService {
   }
 
   public async signup(signupDto: SignupDto): Promise<void> {
-    const isAccountExists = await this.adminAccountRepository.findUnique(
-      signupDto.email,
-    );
+    const isAccountExists = await this.adminAccountRepository.findUnique({
+      email: signupDto.email.toLowerCase(),
+    });
     if (isAccountExists) {
       this.logger.warn(
         `Account cannot sign up because already exists, email=${signupDto.email}`,
