@@ -5,6 +5,6 @@ import globalConfig from '../../config/global.config';
 @Injectable()
 export class JwtAccessService extends JWTUtil {
   constructor() {
-    super(globalConfig().accessJwtSecret, '5h');
+    super(globalConfig().accessJwtSecret, '1h');
   }
 }

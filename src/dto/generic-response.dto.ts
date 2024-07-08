@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export default class HealthDto {
+export class GenericResponseDto {
   @ApiProperty()
   public status: string;
 
@@ -8,7 +8,7 @@ export default class HealthDto {
     this.status = status;
   }
 
-  public static ok(): HealthDto {
-    return new HealthDto('ok');
+  public static ok(): GenericResponseDto {
+    return new GenericResponseDto('ok');
   }
 }

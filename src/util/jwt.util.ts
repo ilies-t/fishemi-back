@@ -41,7 +41,7 @@ export class JWTUtil {
   public getJwtFromHeaders(
     headers: Headers | IncomingHttpHeaders,
   ): JwtInterface {
-    let authorization = headers['Authorization'];
+    let authorization = headers['authorization'];
 
     if (!authorization?.startsWith('Bearer')) {
       throw new UnauthorizedException();
