@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { event } from '@prisma/client';
-import { MeClickedEventDto, EventsStatsDto } from '../dto/account/me.dto';
+import { MeClickedEventDto, EventsStatsDto } from '@dto/account/me.dto';
 import * as dayjs from 'dayjs';
 import * as LocalizedFormat from 'dayjs/plugin/localizedFormat';
-import { EventEnum } from '../enumerator/event-type.enum';
-import { EventRepository } from '../repository/event.repository';
+import { EventEnum } from '@enumerators/event-type.enum';
+import { EventRepository } from '@repositories/event.repository';
 
 dayjs.extend(LocalizedFormat);
 dayjs.locale('fr');

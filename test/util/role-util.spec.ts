@@ -1,4 +1,4 @@
-import { RoleUtil } from '../../src/util/role.util';
+import { RoleUtil } from '@utils/role.util';
 
 describe('RoleUtil', () => {
   it('Should return higher role as French format', async () => {

@@ -7,9 +7,9 @@ import {
   Query,
   Headers,
 } from '@nestjs/common';
-import { AuthDisabled } from '../decorator/auth-disabled.decorator';
-import { AdminAccountService } from '../service/admin-account.service';
-import JWTTokensDto from '../dto/jwt-tokens.dto';
+import { AuthDisabled } from '@decorators/auth-disabled.decorator';
+import { AdminAccountService } from '@services/admin-account.service';
+import JWTTokensDto from '@dto/jwt-tokens.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,9 +17,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { SignupDto } from '../dto/account/signup.dto';
-import { GenericResponseDto } from '../dto/generic-response.dto';
-import { MeDto } from '../dto/account/me.dto';
+import { SignupDto } from '@dto/account/signup.dto';
+import { GenericResponseDto } from '@dto/generic-response.dto';
+import { MeDto } from '@dto/account/me.dto';
 
 @Controller('/account')
 @ApiTags('Account')
@@ -50,6 +50,7 @@ export class AdminAccountController {
   })
   @ApiResponse({ status: 201, type: GenericResponseDto })
   @ApiResponse({ status: 400 })
+  @ApiResponse({ status: 409 })
   @ApiBody({ type: SignupDto })
   @AuthDisabled()
   public async signup(

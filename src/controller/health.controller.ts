@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { AuthDisabled } from '../decorator/auth-disabled.decorator';
+import { AuthDisabled } from '@decorators/auth-disabled.decorator';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GenericResponseDto } from '../dto/generic-response.dto';
+import { GenericResponseDto } from '@dto/generic-response.dto';
 
 @Controller()
 @ApiTags('Health')

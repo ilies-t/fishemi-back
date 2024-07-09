@@ -5,7 +5,6 @@ import {
   UploadedFile,
   UseInterceptors,
   Post,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -13,9 +12,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { GenericResponseDto } from '../dto/generic-response.dto';
-import { CsvFileInterceptor } from '../interceptor/file.interceptor';
-import { EmployeeService } from '../service/employee.service';
+import { GenericResponseDto } from '@dto/generic-response.dto';
+import { CsvFileInterceptor } from '@interceptors/file.interceptor';
+import { EmployeeService } from '@services/employee.service';
 
 @Controller('/employee')
 @ApiTags('Employee')

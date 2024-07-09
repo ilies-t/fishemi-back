@@ -1,14 +1,14 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './config/app.module';
-import globalConfig from './config/global.config';
+import { AppModule } from '@config/app.module';
+import globalConfig from '@config/global.config';
 import {
   ClassSerializerInterceptor,
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
 import helmet from 'helmet';
-import { AuthGuard } from './guard/auth.guard';
-import { JwtAccessService } from './service/jwt/jwt-access.service';
+import { AuthGuard } from '@guards/auth.guard';
+import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
