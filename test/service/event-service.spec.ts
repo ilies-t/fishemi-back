@@ -1,10 +1,10 @@
-import { EventService } from '../../src/service/event.service';
+import { EventService } from '@services/event.service';
 import { event } from '@prisma/client';
 import * as dayjs from 'dayjs';
-import { EventEnum } from '../../src/enumerator/event-type.enum';
-import { MeClickedEventDto } from '../../src/dto/account/me.dto';
-import { EventRepository } from '../../src/repository/event.repository';
-import { PrismaService } from '../../src/service/prisma.service';
+import { EventEnum } from '@enumerators/event-type.enum';
+import { MeClickedEventDto } from '@dto/account/me.dto';
+import { EventRepository } from '@repositories/event.repository';
+import { PrismaService } from '@services/prisma.service';
 
 describe('EventService', () => {
   let eventRepo: EventRepository;

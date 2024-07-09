@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BadRequestException } from '../exception/bad-request.exception';
+import { BadRequestException } from '@exceptions/bad-request.exception';
 import * as csv from 'csvtojson';
 import { Readable } from 'stream';
-import { EmployeeRepository } from '../repository/employee.repository';
-import { JwtAccessService } from './jwt/jwt-access.service';
+import { EmployeeRepository } from '@repositories/employee.repository';
+import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()

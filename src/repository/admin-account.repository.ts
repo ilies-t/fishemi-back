@@ -1,8 +1,11 @@
 import { admin_account } from '@prisma/client';
-import { PrismaService } from '../service/prisma.service';
+import { PrismaService } from '@services/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { RolesEnum } from '../enumerator/roles.enum';
-import { SignupDto } from '../dto/account/signup.dto';
+import { RolesEnum } from '@enumerators/roles.enum';
+import { SignupDto } from '@dto/account/signup.dto';
+import { randomBytes } from 'node:crypto';
+import { addMinutes } from 'date-fns';
+import globalConfig from '@config/global.config';
 
 @Injectable()
 export class AdminAccountRepository {
@@ -30,6 +33,24 @@ export class AdminAccountRepository {
         },
       },
     });
+  }
+
+  public async addOtp(accountId: string): Promise<string> {
+    const otpCode = randomBytes(30).toString('hex');
+    const otpCodeExpiration = addMinutes(
+      new Date(),
+      globalConfig().otpExpiresIn,
+    );
+    await this.prisma.admin_account.update({
+      where: {
+        id: accountId,
+      },
+      data: {
+        otp_code: otpCode,
+        otp_code_expiration: otpCodeExpiration,
+      },
+    });
+    return otpCode;
   }
 
   public async deleteOtp(accountId: string): Promise<void> {

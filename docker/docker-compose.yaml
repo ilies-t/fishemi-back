@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+
+  fishemi-db:
+    image: postgres:12.0-alpine
+    restart: always
+    volumes:
+      - ../database.sql:/docker-entrypoint-initdb.d/database.sql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: fishemi
+    ports:
+      - "5433:5432"

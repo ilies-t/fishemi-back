@@ -1,7 +1,7 @@
 import { NestInterceptor, Type } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
-import { BadRequestException } from '../exception/bad-request.exception';
+import { BadRequestException } from '@exceptions/bad-request.exception';
 
 export const CsvFileInterceptor = (): Type<NestInterceptor> => {
   return FileInterceptor('file', {

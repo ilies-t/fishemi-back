@@ -1,5 +1,5 @@
 import { event } from '@prisma/client';
-import { PrismaService } from '../service/prisma.service';
+import { PrismaService } from '@services/prisma.service';
 import { Injectable } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 

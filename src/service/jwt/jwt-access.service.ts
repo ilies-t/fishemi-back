@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { JWTUtil } from '../../util/jwt.util';
-import globalConfig from '../../config/global.config';
+import { JWTUtil } from '@utils/jwt.util';
+import globalConfig from '@config/global.config';
 
 @Injectable()
 export class JwtAccessService extends JWTUtil {
   constructor() {
-    super(globalConfig().accessJwtSecret, '1h');
+    super(globalConfig().accessJwtSecret, globalConfig().jwtExpiresIn);
   }
 }

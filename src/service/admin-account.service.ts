@@ -1,15 +1,16 @@
 import { Body, Injectable, Logger } from '@nestjs/common';
-import { AdminAccountRepository } from '../repository/admin-account.repository';
-import JWTTokensDto from '../dto/jwt-tokens.dto';
-import { UnauthorizedException } from '../exception/unauthorized.exception';
-import { JwtAccessService } from './jwt/jwt-access.service';
-import { JwtRefreshService } from './jwt/jwt-refresh.service';
-import { SignupDto } from '../dto/account/signup.dto';
+import { AdminAccountRepository } from '@repositories/admin-account.repository';
+import JWTTokensDto from '@dto/jwt-tokens.dto';
+import { UnauthorizedException } from '@exceptions/unauthorized.exception';
+import { AlreadyExistException } from '@exceptions/already-exist.exception';
+import { JwtAccessService } from '@services/jwt/jwt-access.service';
+import { JwtRefreshService } from '@services/jwt/jwt-refresh.service';
+import { SignupDto } from '@dto/account/signup.dto';
 import * as dayjs from 'dayjs';
-import { EventService } from './event.service';
-import { MeDto } from '../dto/account/me.dto';
-import { EmployeeRepository } from '../repository/employee.repository';
-import { CampaignRepository } from '../repository/campaign.repository';
+import { EventService } from '@services/event.service';
+import { MeDto } from '@dto/account/me.dto';
+import { EmployeeRepository } from '@repositories/employee.repository';
+import { CampaignRepository } from '@repositories/campaign.repository';
 
 @Injectable()
 export class AdminAccountService {
@@ -71,10 +72,14 @@ export class AdminAccountService {
       this.logger.warn(
         `Account cannot sign up because already exists, email=${signupDto.email}`,
       );
-      return;
+      throw new AlreadyExistException();
     }
     await this.adminAccountRepository.save(signupDto);
     this.logger.log(`Account successfully signed up, email=${signupDto.email}`);
+    const otpCode = await this.adminAccountRepository.addOtp(signupDto.email);
+    this.logger.log(`Account OTP code added, email=${signupDto.email}`);
+    // send otp code to email
+    this.logger.log(`Account OTP code sent to email, email=${signupDto.email}`);
   }
 
   public async me(headers: Headers): Promise<MeDto> {
