@@ -20,34 +20,24 @@ export class AdminAccountRepository {
     });
   }
 
-  public async save(signupDto: SignupDto): Promise<void> {
+  public async save(signupDto: SignupDto): Promise<string> {
+    const otpCode = randomBytes(24).toString('hex');
+    const otpCodeExpiration = addMinutes(
+      new Date(),
+      globalConfig().otpExpiresIn,
+    );
     await this.prisma.admin_account.create({
       data: {
         email: signupDto.email,
         full_name: signupDto.user_full_name,
         roles: [RolesEnum.Admin, RolesEnum.Writer, RolesEnum.Lector].join(','),
+        otp_code: otpCode,
+        otp_code_expiration: otpCodeExpiration,
         company: {
           create: {
             name: signupDto.company_name,
           },
         },
-      },
-    });
-  }
-
-  public async addOtp(accountId: string): Promise<string> {
-    const otpCode = randomBytes(30).toString('hex');
-    const otpCodeExpiration = addMinutes(
-      new Date(),
-      globalConfig().otpExpiresIn,
-    );
-    await this.prisma.admin_account.update({
-      where: {
-        id: accountId,
-      },
-      data: {
-        otp_code: otpCode,
-        otp_code_expiration: otpCodeExpiration,
       },
     });
     return otpCode;
@@ -63,5 +53,23 @@ export class AdminAccountRepository {
         otp_code_expiration: null,
       },
     });
+  }
+
+  public async updateOtp(accountId: string): Promise<string> {
+    const otpCode = randomBytes(24).toString('hex');
+    const otpCodeExpiration = addMinutes(
+      new Date(),
+      globalConfig().otpExpiresIn,
+    );
+    await this.prisma.admin_account.update({
+      where: {
+        id: accountId,
+      },
+      data: {
+        otp_code: otpCode,
+        otp_code_expiration: otpCodeExpiration,
+      },
+    });
+    return otpCode;
   }
 }

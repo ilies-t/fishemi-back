@@ -8,9 +8,11 @@ import { JwtRefreshService } from '@services/jwt/jwt-refresh.service';
 import { SignupDto } from '@dto/account/signup.dto';
 import * as dayjs from 'dayjs';
 import { EventService } from '@services/event.service';
+import { QueueService } from '@services/queue.service';
 import { MeDto } from '@dto/account/me.dto';
 import { EmployeeRepository } from '@repositories/employee.repository';
 import { CampaignRepository } from '@repositories/campaign.repository';
+import globalConfig from '@config/global.config';
 
 @Injectable()
 export class AdminAccountService {
@@ -23,6 +25,7 @@ export class AdminAccountService {
     private readonly eventService: EventService,
     private readonly campaignRepository: CampaignRepository,
     private readonly employeeRepository: EmployeeRepository,
+    private readonly queueService: QueueService,
   ) {}
 
   public async login(email: string, otpCode: string): Promise<JWTTokensDto> {
@@ -74,11 +77,18 @@ export class AdminAccountService {
       );
       throw new AlreadyExistException();
     }
-    await this.adminAccountRepository.save(signupDto);
+    const otpcode = await this.adminAccountRepository.save(signupDto);
     this.logger.log(`Account successfully signed up, email=${signupDto.email}`);
-    const otpCode = await this.adminAccountRepository.addOtp(signupDto.email);
-    this.logger.log(`Account OTP code added, email=${signupDto.email}`);
-    // send otp code to email
+    const messageToPush = {
+      email: signupDto.email.toLowerCase(),
+      first_name: signupDto.user_full_name,
+      otp_code: otpcode,
+    };
+    await this.queueService.publishInQueue(
+      globalConfig().loginQueue,
+      messageToPush,
+    );
+
     this.logger.log(`Account OTP code sent to email, email=${signupDto.email}`);
   }
 
@@ -125,5 +135,26 @@ export class AdminAccountService {
       companyId: me.company_id,
     });
     return new JWTTokensDto(jwtAccessToken, null);
+  }
+
+  public async sendOtp(email: string) {
+    const account = await this.adminAccountRepository.findUnique({
+      email: email.toLowerCase(),
+    });
+    if (!account) {
+      this.logger.warn(`Account not found, email=${email}`);
+      throw new UnauthorizedException();
+    }
+    const otpCode = await this.adminAccountRepository.updateOtp(account.id);
+    const messageToPush = {
+      email: email.toLowerCase(),
+      first_name: account.full_name,
+      otp_code: otpCode,
+    };
+    await this.queueService.publishInQueue(
+      globalConfig().loginQueue,
+      messageToPush,
+    );
+    this.logger.log(`Account OTP code sent to email, email=${email}`);
   }
 }

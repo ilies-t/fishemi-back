@@ -44,6 +44,18 @@ export class AdminAccountController {
     return this.adminAccountService.login(email, otpCode);
   }
 
+  @Get('/sendOtp')
+  @ApiOperation({
+    summary: 'Send OTP code to email',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  @ApiResponse({ status: 400 })
+  @AuthDisabled()
+  public async sendOtp(@Query('email') email: string): Promise<void> {
+    this.logger.log(`Handling sendOtp, email=${email}`);
+    return this.adminAccountService.sendOtp(email);
+  }
+
   @Post('/signup')
   @ApiOperation({
     summary: 'Signup new admin account',
