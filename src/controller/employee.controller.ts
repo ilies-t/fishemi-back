@@ -5,6 +5,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Post,
+  Get,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -15,6 +16,7 @@ import {
 import { GenericResponseDto } from '@dto/generic-response.dto';
 import { CsvFileInterceptor } from '@interceptors/file.interceptor';
 import { EmployeeService } from '@services/employee.service';
+import { EmployeeDto } from '@dto/employee.dto';
 
 @Controller('/employee')
 @ApiTags('Employee')
@@ -40,5 +42,16 @@ export class EmployeeController {
     return this.employeeService
       .import(headers, file)
       .then(() => GenericResponseDto.ok());
+  }
+
+  @Get('')
+  @ApiOperation({
+    summary: 'Get all employees',
+  })
+  @ApiResponse({ status: 200, type: EmployeeDto, isArray: true })
+  @ApiResponse({ status: 401 })
+  public async findAll(@Headers() headers: Headers): Promise<EmployeeDto[]> {
+    this.logger.log(`Handling findAll employee`);
+    return this.employeeService.findAll(headers);
   }
 }
