@@ -5,6 +5,7 @@ import { Readable } from 'stream';
 import { EmployeeRepository } from '@repositories/employee.repository';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { Prisma } from '@prisma/client';
+import { EmployeeDto } from '@dto/employee.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -48,5 +49,11 @@ export class EmployeeService {
         'Erreur lors de la lecture du fichier CSV, veuillez vérifier le format',
       );
     }
+  }
+
+  public async findAll(headers: Headers): Promise<EmployeeDto[]> {
+    const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
+    const employees = await this.employeeRepo.findByCompany(jwt.companyId);
+    return employees.map((employee) => new EmployeeDto(employee));
   }
 }

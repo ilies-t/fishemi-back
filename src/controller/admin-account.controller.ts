@@ -25,7 +25,7 @@ import { MeDto } from '@dto/account/me.dto';
 @ApiTags('Account')
 @ApiBearerAuth()
 export class AdminAccountController {
-  private readonly logger = new Logger(AdminAccountService.name);
+  private readonly logger = new Logger(AdminAccountController.name);
 
   constructor(private readonly adminAccountService: AdminAccountService) {}
 

@@ -1,4 +1,4 @@
-import { EventService } from '@services/event.service';
+import { EventService } from '../../src/service/event.service';
 import { event } from '@prisma/client';
 import * as dayjs from 'dayjs';
 import { EventEnum } from '@enumerators/event-type.enum';
