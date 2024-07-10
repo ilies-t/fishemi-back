@@ -53,7 +53,7 @@ export class EmployeeService {
 
   public async findAll(headers: Headers): Promise<EmployeeDto[]> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
-    const employees = await this.employeeRepo.findAll(jwt.companyId);
+    const employees = await this.employeeRepo.findByCompany(jwt.companyId);
     return employees.map((employee) => new EmployeeDto(employee));
   }
 }

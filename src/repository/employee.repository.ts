@@ -29,12 +29,4 @@ export class EmployeeRepository {
       data: allEmployees,
     });
   }
-
-  public async findAll(companyId: string): Promise<employee[]> {
-    return this.prisma.employee.findMany({
-      where: {
-        company_id: companyId,
-      },
-    });
-  }
 }
