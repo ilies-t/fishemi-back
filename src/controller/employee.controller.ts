@@ -46,7 +46,7 @@ export class EmployeeController {
 
   @Get('')
   @ApiOperation({
-    summary: 'Get all employees',
+    summary: 'Get all user employees',
   })
   @ApiResponse({ status: 200, type: EmployeeDto, isArray: true })
   @ApiResponse({ status: 401 })
