@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../service/prisma.service';
-import { AdminAccountService } from '../service/admin-account.service';
-import { AdminAccountRepository } from '../repository/admin-account.repository';
-import { AdminAccountController } from '../controller/admin-account.controller';
-import { JwtAccessService } from '../service/jwt/jwt-access.service';
-import { JwtRefreshService } from '../service/jwt/jwt-refresh.service';
-import { EventService } from '../service/event.service';
-import { EventRepository } from '../repository/event.repository';
-import { EmployeeRepository } from '../repository/employee.repository';
-import { CampaignRepository } from '../repository/campaign.repository';
+import { PrismaService } from '@services/prisma.service';
+import { AdminAccountService } from '@services/admin-account.service';
+import { AdminAccountRepository } from '@repositories/admin-account.repository';
+import { AdminAccountController } from '@controllers/admin-account.controller';
+import { JwtAccessService } from '@services/jwt/jwt-access.service';
+import { JwtRefreshService } from '@services/jwt/jwt-refresh.service';
+import { EventService } from '@services/event.service';
+import { EventRepository } from '@repositories/event.repository';
+import { EmployeeRepository } from '@repositories/employee.repository';
+import { CampaignRepository } from '@repositories/campaign.repository';
+import { QueueService } from '@services/queue.service';
 
 @Module({
   imports: [],
@@ -23,6 +24,7 @@ import { CampaignRepository } from '../repository/campaign.repository';
     EventRepository,
     CampaignRepository,
     EmployeeRepository,
+    QueueService,
   ],
 })
 export class AdminAccountModule {}

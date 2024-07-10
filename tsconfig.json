@@ -16,6 +16,21 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@config/*": ["src/config/*"],
+      "@controllers/*": ["src/controller/*"],
+      "@exceptions/*": ["src/exception/*"],
+      "@interfaces/*": ["src/interface/*"],
+      "@decorators/*": ["src/decorator/*"],
+      "@interceptors/*": ["src/interceptor/*"],
+      "@models/*": ["src/models/*"],
+      "@services/*": ["src/service/*"],
+      "@utils/*": ["src/util/*"],
+      "@guards/*": ["src/guard/*"],
+      "@dto/*": ["src/dto/*"],
+      "@repositories/*": ["src/repository/*"],
+      "@enumerators/*": ["src/enumerator/*"],
+    }
   }
 }

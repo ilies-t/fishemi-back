@@ -7,9 +7,9 @@ import {
   Query,
   Headers,
 } from '@nestjs/common';
-import { AuthDisabled } from '../decorator/auth-disabled.decorator';
-import { AdminAccountService } from '../service/admin-account.service';
-import JWTTokensDto from '../dto/jwt-tokens.dto';
+import { AuthDisabled } from '@decorators/auth-disabled.decorator';
+import { AdminAccountService } from '@services/admin-account.service';
+import JWTTokensDto from '@dto/jwt-tokens.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,9 +17,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { SignupDto } from '../dto/account/signup.dto';
-import { GenericResponseDto } from '../dto/generic-response.dto';
-import { MeDto } from '../dto/account/me.dto';
+import { SignupDto } from '@dto/account/signup.dto';
+import { GenericResponseDto } from '@dto/generic-response.dto';
+import { MeDto } from '@dto/account/me.dto';
 
 @Controller('/account')
 @ApiTags('Account')
@@ -44,12 +44,25 @@ export class AdminAccountController {
     return this.adminAccountService.login(email, otpCode);
   }
 
+  @Get('/sendOtp')
+  @ApiOperation({
+    summary: 'Send OTP code to email',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  @ApiResponse({ status: 400 })
+  @AuthDisabled()
+  public async sendOtp(@Query('email') email: string): Promise<void> {
+    this.logger.log(`Handling sendOtp, email=${email}`);
+    return this.adminAccountService.sendOtp(email);
+  }
+
   @Post('/signup')
   @ApiOperation({
     summary: 'Signup new admin account',
   })
   @ApiResponse({ status: 201, type: GenericResponseDto })
   @ApiResponse({ status: 400 })
+  @ApiResponse({ status: 409 })
   @ApiBody({ type: SignupDto })
   @AuthDisabled()
   public async signup(

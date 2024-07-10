@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { EmployeeController } from '../controller/employee.controller';
-import { EmployeeService } from '../service/employee.service';
-import { EmployeeRepository } from '../repository/employee.repository';
-import { JwtAccessService } from '../service/jwt/jwt-access.service';
-import { PrismaService } from '../service/prisma.service';
+import { EmployeeController } from '@controllers/employee.controller';
+import { EmployeeService } from '@services/employee.service';
+import { EmployeeRepository } from '@repositories/employee.repository';
+import { JwtAccessService } from '@services/jwt/jwt-access.service';
+import { PrismaService } from '@services/prisma.service';
 
 @Module({
   imports: [],

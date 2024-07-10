@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { IncomingHttpHeaders } from 'http';
-import { JwtInterface } from '../interface/jwt.interface';
-import { UnauthorizedException } from '../exception/unauthorized.exception';
+import { JwtInterface } from '@interfaces/jwt.interface';
+import { UnauthorizedException } from '@exceptions/unauthorized.exception';
 
 export class JWTUtil {
   private readonly jwt: JwtService;

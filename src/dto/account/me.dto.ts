@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { admin_account } from '@prisma/client';
-import { RoleUtil } from '../../util/role.util';
+import { RoleUtil } from '@utils/role.util';
 
 class MePersonalDataDto {
   @ApiProperty()
