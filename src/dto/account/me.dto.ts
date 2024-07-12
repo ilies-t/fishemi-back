@@ -58,7 +58,6 @@ export class MeDto {
   @ApiProperty()
   public total_employees: number;
 
-  // FIXME: missing campaign + employee stats
   public constructor(
     events_stats: EventsStatsDto,
     account: admin_account,
