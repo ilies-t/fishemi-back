@@ -16,4 +16,13 @@ export class ListRepository {
       },
     });
   }
+
+  public async create(companyId: string, name: string): Promise<list> {
+    return this.prisma.list.create({
+      data: {
+        company_id: companyId,
+        name: name,
+      },
+    });
+  }
 }

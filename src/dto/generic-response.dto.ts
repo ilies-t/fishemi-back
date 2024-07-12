@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GenericResponseDto {
   @ApiProperty()
-  public status: string;
+  public status: string | string[];
 
-  constructor(status: string) {
+  constructor(status: string | string[]) {
     this.status = status;
   }
 

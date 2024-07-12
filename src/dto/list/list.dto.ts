@@ -14,6 +14,8 @@ export class ListDto {
   constructor(list: list) {
     this.id = list.id;
     this.name = list.name;
-    this.employeeCount = list['employee_lists'].length;
+    this.employeeCount = list['employee_lists']
+      ? list['employee_lists'].length
+      : 0;
   }
 }

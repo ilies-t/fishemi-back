@@ -1,22 +1,27 @@
 import {
+  Body,
   Controller,
-  Logger,
+  Get,
   Headers,
+  Logger,
+  Patch,
+  Post,
+  Query,
   UploadedFile,
   UseInterceptors,
-  Post,
-  Get,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { GenericResponseDto } from '@dto/generic-response.dto';
 import { CsvFileInterceptor } from '@interceptors/file.interceptor';
 import { EmployeeService } from '@services/employee.service';
-import { EmployeeDto } from '@dto/employee.dto';
+import { EmployeeDto } from '@dto/employee/employee.dto';
+import { EmployeeListDto } from '@dto/employee/employee-list.dto';
 
 @Controller('/employee')
 @ApiTags('Employee')
@@ -53,5 +58,44 @@ export class EmployeeController {
   public async findAll(@Headers() headers: Headers): Promise<EmployeeDto[]> {
     this.logger.log(`Handling findAll employee`);
     return this.employeeService.findAll(headers);
+  }
+
+  @Get('/search')
+  @ApiOperation({
+    summary: 'Search for employees',
+  })
+  @ApiResponse({ status: 200, type: EmployeeListDto, isArray: true })
+  @ApiResponse({ status: 401 })
+  @ApiQuery({
+    name: 'current-list',
+    description:
+      'Optional. Will return boolean about if a employee is in the list ("is_present_in_list" field)',
+    required: false,
+  })
+  public async search(
+    @Headers() headers: Headers,
+    @Query('name') searchElement: string,
+    @Query('current-list') currentList: string,
+  ): Promise<EmployeeListDto[]> {
+    this.logger.log(
+      `Handling search employee, searchElement=${searchElement}, currentList=${currentList}`,
+    );
+    return this.employeeService.search(headers, searchElement, currentList);
+  }
+
+  @Patch('')
+  @ApiOperation({
+    summary: 'Update employee data',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  @ApiResponse({ status: 400 })
+  public async update(
+    @Headers() headers: Headers,
+    @Body() employee: EmployeeDto,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(`Handling update employee, id=${employee.id}`);
+    return this.employeeService
+      .update(headers, employee)
+      .then(() => GenericResponseDto.ok());
   }
 }
