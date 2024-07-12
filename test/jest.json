@@ -1,0 +1,24 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../",
+  "testEnvironment": "node",
+  "testRegex": ".spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@config/(.*)$": "<rootDir>/src/config/$1",
+    "^@controllers/(.*)$": "<rootDir>/src/controller/$1",
+    "^@exceptions/(.*)$": "<rootDir>/src/exception/$1",
+    "^@interfaces/(.*)$": "<rootDir>/src/interface/$1",
+    "^@decorators/(.*)$": "<rootDir>/src/decorator/$1",
+    "^@interceptors/(.*)$": "<rootDir>/src/interceptor/$1",
+    "^@models/(.*)$": "<rootDir>/src/models/$1",
+    "^@services/(.*)$": "<rootDir>/src/service/$1",
+    "^@utils/(.*)$": "<rootDir>/src/util/$1",
+    "^@guards/(.*)$": "<rootDir>/src/guard/$1",
+    "^@dto/(.*)$": "<rootDir>/src/dto/$1",
+    "^@repositories/(.*)$": "<rootDir>/src/repository/$1",
+    "^@enumerators/(.*)$": "<rootDir>/src/enumerator/$1"
+  }
+}

@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { IncomingHttpHeaders } from 'http';
-import { JwtInterface } from '../interface/jwt.interface';
-import { UnauthorizedException } from '../exception/unauthorized.exception';
+import { JwtInterface } from '@interfaces/jwt.interface';
+import { UnauthorizedException } from '@exceptions/unauthorized.exception';
 
 export class JWTUtil {
   private readonly jwt: JwtService;
@@ -9,7 +9,7 @@ export class JWTUtil {
   constructor(secret: string, expiresIn: string) {
     this.jwt = new JwtService({
       signOptions: {
-        algorithm: 'ES256',
+        algorithm: 'HS512',
         expiresIn: expiresIn,
       },
       secret: secret,
@@ -41,7 +41,7 @@ export class JWTUtil {
   public getJwtFromHeaders(
     headers: Headers | IncomingHttpHeaders,
   ): JwtInterface {
-    let authorization = headers['Authorization'];
+    let authorization = headers['authorization'];
 
     if (!authorization?.startsWith('Bearer')) {
       throw new UnauthorizedException();

@@ -1,21 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthService } from '../service/health.service';
-import HealthDto from '../dto/health.dto';
-import { company } from '@prisma/client';
-import { AuthDisabled } from '../decorator/auth-disabled.decorator';
+import { AuthDisabled } from '@decorators/auth-disabled.decorator';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GenericResponseDto } from '@dto/generic-response.dto';
 
 @Controller()
+@ApiTags('Health')
 export class HealthController {
-  constructor(private readonly appService: HealthService) {}
-
   @Get()
   @AuthDisabled()
-  public async health(): Promise<HealthDto> {
-    return this.appService.health();
-  }
-
-  @Get('/test')
-  public async test(): Promise<company[]> {
-    return this.appService.findAll();
+  @ApiOperation({ summary: 'Check that API is running' })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  public async health(): Promise<GenericResponseDto> {
+    return GenericResponseDto.ok();
   }
 }
