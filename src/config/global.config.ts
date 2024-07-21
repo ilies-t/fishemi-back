@@ -15,4 +15,8 @@ export default () => ({
   refreshJwtExpiresIn: process.env.REFRESH_JWT_EXPIRES_IN,
   amqpurl: process.env.AMQP_URL,
   loginQueue: process.env.AMQP_LOGIN_QUEUE,
+  mistralAiBaseUrl: process.env.MISTRAL_AI_BASE_URL,
+  mistralAiKey: process.env.MISTRAL_AI_KEY,
+  eurExcludingTaxPricePerEmployee: 3.99,
+  franceVatRate: 20,
 });

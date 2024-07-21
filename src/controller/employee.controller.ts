@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Logger,
@@ -19,9 +20,12 @@ import {
 } from '@nestjs/swagger';
 import { GenericResponseDto } from '@dto/generic-response.dto';
 import { CsvFileInterceptor } from '@interceptors/file.interceptor';
-import { EmployeeService } from '@services/employee.service';
+import { EmployeeService } from '@services/employee/employee.service';
 import { EmployeeDto } from '@dto/employee/employee.dto';
 import { EmployeeListDto } from '@dto/employee/employee-list.dto';
+import { DeleteEmployeeDto } from '@dto/employee/delete-employee.dto';
+import { EmployeeImportService } from '@services/employee/employee-import.service';
+import { RoleRestricted } from '@decorators/role-restricted.decorator';
 
 @Controller('/employee')
 @ApiTags('Employee')
@@ -29,11 +33,15 @@ import { EmployeeListDto } from '@dto/employee/employee-list.dto';
 export class EmployeeController {
   private readonly logger = new Logger(EmployeeController.name);
 
-  constructor(private readonly employeeService: EmployeeService) {}
+  constructor(
+    private readonly employeeService: EmployeeService,
+    private readonly employeeImportService: EmployeeImportService,
+  ) {}
 
+  @RoleRestricted()
   @Post('/import')
   @ApiOperation({
-    summary: 'Import employee data from CSV file',
+    summary: 'Import employee data from CSV file (only writers role)',
   })
   @ApiResponse({ status: 200, type: GenericResponseDto })
   @ApiResponse({ status: 400 })
@@ -44,7 +52,7 @@ export class EmployeeController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<GenericResponseDto> {
     this.logger.log(`Handling employee import, fileName=${file?.originalname}`);
-    return this.employeeService
+    return this.employeeImportService
       .import(headers, file)
       .then(() => GenericResponseDto.ok());
   }
@@ -83,9 +91,10 @@ export class EmployeeController {
     return this.employeeService.search(headers, searchElement, currentList);
   }
 
+  @RoleRestricted()
   @Patch('')
   @ApiOperation({
-    summary: 'Update employee data',
+    summary: 'Update employee data (only writers role)',
   })
   @ApiResponse({ status: 200, type: GenericResponseDto })
   @ApiResponse({ status: 400 })
@@ -96,6 +105,23 @@ export class EmployeeController {
     this.logger.log(`Handling update employee, id=${employee.id}`);
     return this.employeeService
       .update(headers, employee)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @RoleRestricted()
+  @Delete('')
+  @ApiOperation({
+    summary: 'Delete employees by id (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  @ApiResponse({ status: 400 })
+  public async delete(
+    @Headers() headers: Headers,
+    @Body() body: DeleteEmployeeDto,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(`Handling delete employee, body=${body}`);
+    return this.employeeService
+      .delete(headers, body)
       .then(() => GenericResponseDto.ok());
   }
 }

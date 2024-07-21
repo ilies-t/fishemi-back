@@ -10,13 +10,21 @@ import helmet from 'helmet';
 import { AuthGuard } from '@guards/auth.guard';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RoleGuard } from '@guards/role.guard';
+import { AdminAccountRepository } from '@repositories/admin-account.repository';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // JWT guard
+  const jwtAccessService = app.get(JwtAccessService);
   app.useGlobalGuards(
-    new AuthGuard(app.get(Reflector), new JwtAccessService()),
+    new AuthGuard(app.get(Reflector), jwtAccessService),
+    new RoleGuard(
+      app.get(Reflector),
+      jwtAccessService,
+      app.get(AdminAccountRepository),
+    ),
   );
 
   // logger

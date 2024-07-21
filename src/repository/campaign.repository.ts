@@ -13,4 +13,32 @@ export class CampaignRepository {
       },
     });
   }
+
+  public async findOne(
+    companyId: string,
+    id: string,
+  ): Promise<campaign | null> {
+    return this.prisma.campaign.findUnique({
+      where: {
+        company_id: companyId,
+        id: id,
+      },
+      include: {
+        events: {
+          include: {
+            user: true,
+          },
+        },
+        campaign_lists: {
+          include: {
+            list: {
+              include: {
+                employee_lists: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }
