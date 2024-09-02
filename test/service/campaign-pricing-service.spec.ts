@@ -17,6 +17,11 @@ describe('CampaignPricingService', () => {
     campaignPricingService = new CampaignPricingService(
       jwtAccessService,
       listRepo,
+      null,
+      null,
+      null,
+      null,
+      null,
     );
   });
 
