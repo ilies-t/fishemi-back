@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 export class EmployeeDto {
   @IsUUID(null)
@@ -34,7 +34,7 @@ export class EmployeeDto {
 
   public static fromObject(employee: any): EmployeeDto {
     const employeeDto = new EmployeeDto();
-    employeeDto.id = crypto.randomUUID();
+    employeeDto.id = uuidv4();
     employeeDto.full_name = employee.field1;
     employeeDto.email = employee.field2;
     return employeeDto;
