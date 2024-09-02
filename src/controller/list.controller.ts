@@ -1,11 +1,29 @@
-import { Body, Controller, Get, Headers, Logger, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Logger,
+  Post,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ListService } from '@services/list.service';
 import { ListDto } from '@dto/list/list.dto';
 import { CreateListDto } from '@dto/list/create-list.dto';
+import { GenericResponseDto } from '@dto/generic-response.dto';
+import { ManageEmployeeListDto } from '@dto/list/manage-employee-list.dto';
+import { RoleRestricted } from '@decorators/role-restricted.decorator';
 
 @Controller('/list')
 @ApiTags('List')
+@ApiBearerAuth()
 export class ListController {
   private readonly logger = new Logger(ListController.name);
 
@@ -19,8 +37,9 @@ export class ListController {
     return this.listService.findAll(headers);
   }
 
+  @RoleRestricted()
   @Post('/')
-  @ApiOperation({ summary: 'Create a list' })
+  @ApiOperation({ summary: 'Create a list (only writers role)' })
   @ApiResponse({ status: 201, type: ListDto })
   public async create(
     @Headers() headers: Headers,
@@ -28,5 +47,49 @@ export class ListController {
   ): Promise<ListDto> {
     this.logger.log(`Handling create list, name=${body.name}`);
     return this.listService.create(headers, body);
+  }
+
+  @RoleRestricted()
+  @Post('/employee')
+  @ApiOperation({ summary: 'Add employee into a list (only writers role)' })
+  public async addEmployee(
+    @Headers() headers: Headers,
+    @Body() body: ManageEmployeeListDto,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(
+      `Handling list addEmployee, listId=${body.list_id}, employeeId=${body.employee_id}`,
+    );
+    return this.listService
+      .addEmployeeIntoList(headers, body)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @RoleRestricted()
+  @Delete('/employee')
+  @ApiOperation({ summary: 'Remove employee from a list (only writers role)' })
+  public async deleteEmployee(
+    @Headers() headers: Headers,
+    @Body() body: ManageEmployeeListDto,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(
+      `Handling list deleteEmployee, listId=${body.list_id}, employeeId=${body.employee_id}`,
+    );
+    return this.listService
+      .deleteEmployeeFromList(headers, body)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @Get('/search')
+  @ApiOperation({
+    summary: 'Search for list',
+  })
+  @ApiResponse({ status: 200, type: ListDto, isArray: true })
+  @ApiResponse({ status: 401 })
+  public async search(
+    @Headers() headers: Headers,
+    @Query('name') searchElement: string,
+  ): Promise<ListDto[]> {
+    this.logger.log(`Handling search list, searchElement=${searchElement}`);
+    return this.listService.search(headers, searchElement);
   }
 }

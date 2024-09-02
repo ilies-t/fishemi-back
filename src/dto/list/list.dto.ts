@@ -1,4 +1,4 @@
-import { list } from '@prisma/client';
+import { campaign_list, list } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ListDto {
@@ -9,13 +9,17 @@ export class ListDto {
   public name: string;
 
   @ApiProperty()
-  public employeeCount: number;
+  public employee_count: number;
 
   constructor(list: list) {
     this.id = list.id;
     this.name = list.name;
-    this.employeeCount = list['employee_lists']
+    this.employee_count = list['employee_lists']
       ? list['employee_lists'].length
       : 0;
+  }
+
+  public static fromCampaignList(campaignList: campaign_list): ListDto {
+    return new ListDto(campaignList['list']);
   }
 }

@@ -23,7 +23,6 @@ import { MeDto } from '@dto/account/me.dto';
 
 @Controller('/account')
 @ApiTags('Account')
-@ApiBearerAuth()
 export class AdminAccountController {
   private readonly logger = new Logger(AdminAccountController.name);
 
@@ -36,7 +35,7 @@ export class AdminAccountController {
   @ApiResponse({ status: 200, type: JWTTokensDto })
   @ApiResponse({ status: 400 })
   @AuthDisabled()
-  public async health(
+  public async login(
     @Query('email') email: string,
     @Query('otp-code') otpCode: string,
   ): Promise<JWTTokensDto> {
@@ -80,6 +79,7 @@ export class AdminAccountController {
   @ApiOperation({
     summary: 'Get account information',
   })
+  @ApiBearerAuth()
   public async me(@Headers() headers: Headers): Promise<MeDto> {
     this.logger.log(`Handling me`);
     return this.adminAccountService.me(headers);

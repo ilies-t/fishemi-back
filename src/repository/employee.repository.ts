@@ -16,14 +16,6 @@ export class EmployeeRepository {
     });
   }
 
-  public async reset(companyId: string): Promise<void> {
-    await this.prisma.employee.deleteMany({
-      where: {
-        company_id: companyId,
-      },
-    });
-  }
-
   public async createMany(
     allEmployees: Prisma.employeeCreateManyInput[],
   ): Promise<void> {
@@ -67,6 +59,15 @@ export class EmployeeRepository {
       data: {
         full_name: employee.full_name,
         email: employee.email,
+      },
+    });
+  }
+
+  public async delete(employeeIds: string[], companyId: string): Promise<void> {
+    await this.prisma.employee.deleteMany({
+      where: {
+        id: { in: employeeIds },
+        company_id: companyId,
       },
     });
   }

@@ -33,6 +33,7 @@ model admin_account {
   roles               String
   company             company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
   company_id          String
+  stripe_id           String?   @unique
   is_enabled          Boolean   @default(true)
 }
 
@@ -45,6 +46,8 @@ model employee {
   company_id     String
   employee_lists employee_list[]
   events         event[]
+
+  @@index([full_name], type: BTree)
 }
 
 model list {
@@ -64,17 +67,22 @@ model employee_list {
   employee_id String
   list        list     @relation(fields: [list_id], references: [id], onDelete: Cascade)
   list_id     String
+
+  @@unique([employee_id, list_id])
 }
 
 model campaign {
   id                      String          @id @default(uuid())
   created_at              DateTime        @default(now())
   name                    String
+  subject                 String
+  content                 String
+  template                String?
   company                 company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
   company_id              String
   payment_stripe_id       String?
   amount_paid_without_vat Decimal
-  payment_status          String
+  status                  String
   campaign_lists          campaign_list[]
   events                  event[]
 }
@@ -94,6 +102,6 @@ model event {
   event_type  String
   user_id     String
   campaign_id String
-  user        employee @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user        employee @relation(fields: [user_id], references: [id], onDelete: NoAction)
   campaign    campaign @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
 }

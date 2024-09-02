@@ -13,6 +13,8 @@ import { MeDto } from '@dto/account/me.dto';
 import { EmployeeRepository } from '@repositories/employee.repository';
 import { CampaignRepository } from '@repositories/campaign.repository';
 import globalConfig from '@config/global.config';
+import { ApiStripeService } from '@services/api/api-stripe.service';
+import { admin_account } from '@prisma/client';
 
 @Injectable()
 export class AdminAccountService {
@@ -26,6 +28,7 @@ export class AdminAccountService {
     private readonly campaignRepository: CampaignRepository,
     private readonly employeeRepository: EmployeeRepository,
     private readonly queueService: QueueService,
+    private readonly apiStripeService: ApiStripeService,
   ) {}
 
   public async login(email: string, otpCode: string): Promise<JWTTokensDto> {
@@ -77,7 +80,17 @@ export class AdminAccountService {
       );
       throw new AlreadyExistException();
     }
-    const otpcode = await this.adminAccountRepository.save(signupDto);
+    const databaseId = crypto.randomUUID();
+    const stripeId = await this.apiStripeService.createCustomer(
+      databaseId.toString(),
+      signupDto.email.toLowerCase(),
+      signupDto.user_full_name,
+    );
+    const otpcode = await this.adminAccountRepository.save(
+      databaseId,
+      stripeId,
+      signupDto,
+    );
     this.logger.log(`Account successfully signed up, email=${signupDto.email}`);
     const messageToPush = {
       email: signupDto.email.toLowerCase(),
@@ -92,22 +105,31 @@ export class AdminAccountService {
     this.logger.log(`Account OTP code sent to email, email=${signupDto.email}`);
   }
 
-  public async me(headers: Headers): Promise<MeDto> {
+  public async getCustomer(headers: Headers): Promise<admin_account | null> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
-    const me = await this.adminAccountRepository.findUnique({
+    const customer = this.adminAccountRepository.findUnique({
       id: jwt.sub,
     });
+    if (!customer) {
+      this.logger.error(`Customer not found, jwt=${jwt}`);
+      throw new UnauthorizedException();
+    }
+    return customer;
+  }
+
+  public async me(headers: Headers): Promise<MeDto> {
+    const customer = await this.getCustomer(headers);
     const eventsStats = await this.eventService.countAndGroupEventByDay(
       dayjs(),
-      jwt.companyId,
+      customer.company_id,
     );
     const employees = await this.employeeRepository.findByCompany(
-      jwt.companyId,
+      customer.company_id,
     );
     const campaigns = await this.campaignRepository.findByCompany(
-      jwt.companyId,
+      customer.company_id,
     );
-    return new MeDto(eventsStats, me, campaigns.length, employees.length);
+    return new MeDto(eventsStats, customer, campaigns.length, employees.length);
   }
 
   public async tokenRotation(
