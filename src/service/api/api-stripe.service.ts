@@ -9,9 +9,9 @@ export class ApiStripeService {
   public stripe: Stripe;
 
   constructor() {
-    const key = globalConfig().stripePrivateApiKey;
-    this.stripe = new Stripe(globalConfig().stripePrivateApiKey);
-    this.logger.log(`Connected to Stripe API, key=${key}`);
+    this.stripe = new Stripe(globalConfig().stripePrivateApiKey, {
+      maxNetworkRetries: 5,
+    });
   }
 
   public async createCustomer(
