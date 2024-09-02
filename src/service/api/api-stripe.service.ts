@@ -11,6 +11,7 @@ export class ApiStripeService {
   constructor() {
     this.stripe = new Stripe(globalConfig().stripePrivateApiKey, {
       maxNetworkRetries: 5,
+      httpClient: Stripe.createFetchHttpClient(),
     });
   }
 
@@ -19,12 +20,17 @@ export class ApiStripeService {
     email: string,
     name: string,
   ): Promise<string> {
-    const client = await this.stripe.customers.create({
-      email,
-      metadata: { databaseId },
-      name,
-    });
-    return client.id;
+    try {
+      const client = await this.stripe.customers.create({
+        email,
+        metadata: { databaseId },
+        name,
+      });
+      return client.id;
+    } catch (error) {
+      this.logger.error(`Stripe failed to create customer`, error);
+      throw error;
+    }
   }
 
   public async newCheckout(
