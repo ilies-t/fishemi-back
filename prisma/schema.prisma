@@ -33,6 +33,7 @@ model admin_account {
   roles               String
   company             company   @relation(fields: [company_id], references: [id], onDelete: Cascade)
   company_id          String
+  stripe_id           String?   @unique
   is_enabled          Boolean   @default(true)
 }
 
@@ -81,7 +82,7 @@ model campaign {
   company_id              String
   payment_stripe_id       String?
   amount_paid_without_vat Decimal
-  status                  String          @default("draft")
+  status                  String
   campaign_lists          campaign_list[]
   events                  event[]
 }

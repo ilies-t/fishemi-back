@@ -18,7 +18,7 @@ DROP TABLE IF EXISTS company CASCADE;
 CREATE TABLE company (
   id UUID NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  name TEXT NOT NULL
+  name TEXT  NOT NULL
 );
 
 DROP TABLE IF EXISTS admin_account CASCADE;
@@ -31,6 +31,7 @@ CREATE TABLE admin_account (
   otp_code_expiration TIMESTAMP WITH TIME ZONE,
   roles TEXT NOT NULL,
   company_id UUID NOT NULL,
+  stripe_id TEXT UNIQUE,
   is_enabled BOOLEAN NOT NULL DEFAULT true
 );
 ALTER TABLE admin_account ADD FOREIGN KEY (company_id) REFERENCES company (id) ON DELETE CASCADE;
@@ -76,7 +77,7 @@ CREATE TABLE campaign (
   content TEXT NOT NULL,
   template TEXT,
   company_id UUID NOT NULL,
-  status TEXT NOT NULL DEFAULT 'draft',
+  status TEXT NOT NULL,
   payment_stripe_id TEXT,
   amount_paid_without_vat NUMERIC(10, 2) NOT NULL
 );
@@ -113,10 +114,10 @@ INSERT INTO company (id, name) VALUES
   ('fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'Pixel gagnant'),
   ('b0cbc124-c848-4b48-8ad6-f51e05974363', 'HABENWIR');
 
-INSERT INTO admin_account (full_name, email, roles, company_id) VALUES
-  ('Administrateur', 'administration@pixelgagnant.net', 'admin,writer,lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9'),
-  ('Stéphanie Test', 'ressources-humaine@pixelgagnant.net', 'lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9'),
-  ('Patrick HABENWIR', 'ceo@habenwir.com', 'admin,writer,lector', 'b0cbc124-c848-4b48-8ad6-f51e05974363');
+INSERT INTO admin_account (full_name, email, roles, company_id, stripe_id) VALUES
+  ('Administrateur', 'administration@pixelgagnant.net', 'admin,writer,lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'test'),
+  ('Stéphanie Test', 'ressources-humaine@pixelgagnant.net', 'lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', null),
+  ('Patrick HABENWIR', 'ceo@habenwir.com', 'admin,writer,lector', 'b0cbc124-c848-4b48-8ad6-f51e05974363', 'test-2');
 
 INSERT INTO employee (id, company_id, full_name, email) VALUES
   ('e20a48f4-ad3b-4ce2-9690-03e09421dd85', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'Maxine Rakestraw', 'mrakestraw0@pixelgagnant.net'),
@@ -145,9 +146,9 @@ INSERT INTO employee_list (list_id, employee_id) VALUES
   ('2e40a240-7e19-4bdc-93aa-af72097f596e', '7b7c217b-13f8-4540-9ec6-e8c3a5ab211e'),
   ('cb07e345-3620-4b31-8520-1fdc788610cc', 'e406822e-4fae-4eb0-b849-61676731eeec');
 
-INSERT INTO campaign (id, company_id, name, subject, content, template, amount_paid_without_vat) VALUES
-  ('18bd2562-c5fc-4191-9d92-c5c059448230', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'Test campagne PIXEL DSI', 'Votre mot de passe va expiré', 'test\nOKOK', 'microsoft', 1000),
-  ('ab1be307-4e2b-4e88-b9f6-5acc7a8e405e', 'b0cbc124-c848-4b48-8ad6-f51e05974363', 'habenwir', '', '', null, 600);
+INSERT INTO campaign (id, company_id, name, subject, content, template, amount_paid_without_vat, status) VALUES
+  ('18bd2562-c5fc-4191-9d92-c5c059448230', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'Test campagne PIXEL DSI', 'Votre mot de passe va expiré', 'test\nOKOK', 'microsoft', 1000, 'draft'),
+  ('ab1be307-4e2b-4e88-b9f6-5acc7a8e405e', 'b0cbc124-c848-4b48-8ad6-f51e05974363', 'habenwir', '', '', null, 600, 'draft');
 
 INSERT INTO campaign_list (list_id, campaign_id) VALUES
   ('b115d6ee-8ea5-4291-b354-89400d47aba7', '18bd2562-c5fc-4191-9d92-c5c059448230'),
