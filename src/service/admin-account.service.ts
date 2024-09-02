@@ -15,6 +15,7 @@ import { CampaignRepository } from '@repositories/campaign.repository';
 import globalConfig from '@config/global.config';
 import { ApiStripeService } from '@services/api/api-stripe.service';
 import { admin_account } from '@prisma/client';
+import crypto from 'crypto';
 
 @Injectable()
 export class AdminAccountService {

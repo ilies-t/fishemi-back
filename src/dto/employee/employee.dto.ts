@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import crypto from 'crypto';
 
 export class EmployeeDto {
   @IsUUID(null)
