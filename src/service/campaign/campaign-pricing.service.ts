@@ -33,7 +33,7 @@ export class CampaignPricingService {
     return lists
       .map((item) => item['employee_lists'])
       .reduce((acc, curr) => acc.concat(curr), [])
-      .map((item: employee_list) => item['employee'])
+      .map((item: employee_list) => item['employee'].id)
       .filter((value, index, current) => current.indexOf(value) === index);
   }
 
@@ -43,10 +43,10 @@ export class CampaignPricingService {
   ): Promise<CampaignCalculateResponseDto> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
     const lists = await this.listRepo.findManyById(jwt.companyId, body.lists);
+    const howMuchEmployees = this.getAllEmployeeDuplicateSafe(lists).length;
 
     const amount =
-      this.getAllEmployeeDuplicateSafe(lists).length *
-      globalConfig().eurExcludingTaxPricePerEmployee;
+      howMuchEmployees * globalConfig().eurExcludingTaxPricePerEmployee;
 
     if (amount <= 0) {
       this.logger.error('Campaign price is 0');
