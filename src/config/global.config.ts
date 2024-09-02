@@ -23,6 +23,6 @@ export default () => ({
     process.env.FISHEMI_WEB_PAYMENT_CONFIRMATION_URL,
   fishemiWebPaymentCancellationUrl:
     process.env.FISHEMI_WEB_PAYMENT_CANCELLATION_URL,
-  eurExcludingTaxPricePerEmployee: 299.99,
+  eurExcludingTaxPricePerEmployee: 3.99,
   franceVatRate: 20,
 });

@@ -41,8 +41,16 @@ describe('CampaignPricingService', () => {
           {
             id: 'listId1',
             employee_lists: [
-              { employee_id: 'employeeListId1' },
-              { employee_id: 'employeeListId2' },
+              {
+                employee: {
+                  id: 'employeeListId1',
+                },
+              },
+              {
+                employee: {
+                  id: 'employeeListId2',
+                },
+              },
             ],
           },
           {
@@ -51,7 +59,13 @@ describe('CampaignPricingService', () => {
           },
           {
             id: 'listId3',
-            employee_lists: [{ employee_id: 'employeeListId2' }],
+            employee_lists: [
+              {
+                employee: {
+                  id: 'employeeListId2',
+                },
+              },
+            ],
           },
         ] as any,
     );
