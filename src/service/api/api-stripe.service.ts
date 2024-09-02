@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import globalConfig from '@config/global.config';
 import * as dayjs from 'dayjs';
-import { NumberUtil } from '@utils/number.util';
 
 @Injectable()
 export class ApiStripeService {
@@ -10,7 +9,9 @@ export class ApiStripeService {
   public stripe: Stripe;
 
   constructor() {
+    const key = globalConfig().stripePrivateApiKey;
     this.stripe = new Stripe(globalConfig().stripePrivateApiKey);
+    this.logger.log(`Connected to Stripe API, key=${key}`);
   }
 
   public async createCustomer(
