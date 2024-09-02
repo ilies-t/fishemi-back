@@ -19,12 +19,14 @@ import { CampaignDto } from '@dto/campaign/campaign.dto';
 import { DetailedCampaignDto } from '@dto/campaign/detailed-campaign.dto';
 import { CampaignGeneratedContentDto } from '@dto/campaign/campaign-generated-content.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { MistralService } from '@services/mistral.service';
+import { ApiMistralService } from '@services/api/api-mistral.service';
 import { RoleRestricted } from '@decorators/role-restricted.decorator';
 import { CampaignPricingService } from '@services/campaign/campaign-pricing.service';
-import { EmployeeDto } from '@dto/employee/employee.dto';
 import { CampaignCalculateResponseDto } from '@dto/campaign/campaign-calculate-response.dto';
 import { CampaignCalculateRequestDto } from '@dto/campaign/campaign-calculate-request.dto';
+import { NewCampaignDto } from '@dto/campaign/new-campaign.dto';
+import { CampaignCheckoutDto } from '@dto/campaign/campaign-checkout.dto';
+import { GenericResponseDto } from '@dto/generic-response.dto';
 
 @Controller('/campaign')
 @ApiTags('Campaign')
@@ -34,7 +36,7 @@ export class CampaignController {
 
   constructor(
     private readonly campaignService: CampaignService,
-    private readonly mistralService: MistralService,
+    private readonly mistralService: ApiMistralService,
     private readonly campaignPricingService: CampaignPricingService,
   ) {}
 
@@ -56,7 +58,10 @@ export class CampaignController {
     @Query('id') id: string,
   ): Promise<DetailedCampaignDto> {
     this.logger.log(`Handling get one campaign, id=${id}`);
-    return this.campaignService.getOneCampaign(headers, id);
+    return this.campaignService.getOneCampaignAsDetailedCampaignDto(
+      headers,
+      id,
+    );
   }
 
   @UseGuards(ThrottlerGuard)
@@ -76,9 +81,10 @@ export class CampaignController {
     return this.mistralService.generateContent(headers);
   }
 
+  @RoleRestricted()
   @Post('/calculate')
   @ApiOperation({
-    summary: 'Get price of a campaign',
+    summary: 'Get price of a campaign (only writers role)',
   })
   @ApiResponse({ status: 200, type: CampaignCalculateResponseDto })
   @ApiResponse({
@@ -93,5 +99,57 @@ export class CampaignController {
       `Handling calculate campaign price, body=${JSON.stringify(body)}`,
     );
     return this.campaignPricingService.calculate(headers, body);
+  }
+
+  @RoleRestricted()
+  @Post('/new')
+  @ApiOperation({
+    summary: 'Create a new campaign (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: CampaignDto })
+  @ApiResponse({
+    status: 400,
+    description: 'Body request is not correct',
+  })
+  public async create(
+    @Headers() headers: Headers,
+    @Body() body: NewCampaignDto,
+  ): Promise<CampaignDto> {
+    this.logger.log(`Handling create campaign, body=${JSON.stringify(body)}`);
+    return this.campaignService.create(headers, body);
+  }
+
+  @RoleRestricted()
+  @Get('/create-checkout')
+  @ApiOperation({
+    summary:
+      'Create and get payment checkout session for a campaign (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: CampaignCheckoutDto })
+  public async getCheckout(
+    @Headers() headers: Headers,
+    @Query('campaign_id') campaignId: string,
+  ): Promise<CampaignCheckoutDto> {
+    this.logger.log(`Handling create checkout, campaignId=${campaignId}`);
+    return this.campaignPricingService.createCheckout(headers, campaignId);
+  }
+
+  @RoleRestricted()
+  @Post('/validate-checkout')
+  @ApiOperation({
+    summary:
+      'After payment in Stripe, validate payment checkout session for a campaign (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  public async validateCheckout(
+    @Headers() headers: Headers,
+    @Query('payment_id') paymentStripeId: string,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(
+      `Handling validate checkout, paymentStripeId=${paymentStripeId}`,
+    );
+    return this.campaignPricingService
+      .validateCheckout(headers, paymentStripeId)
+      .then(() => GenericResponseDto.ok());
   }
 }

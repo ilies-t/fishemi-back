@@ -10,6 +10,7 @@ import { EventRepository } from '@repositories/event.repository';
 import { EmployeeRepository } from '@repositories/employee.repository';
 import { CampaignRepository } from '@repositories/campaign.repository';
 import { QueueService } from '@services/queue.service';
+import { ApiStripeService } from '@services/api/api-stripe.service';
 
 @Module({
   imports: [],
@@ -25,6 +26,7 @@ import { QueueService } from '@services/queue.service';
     CampaignRepository,
     EmployeeRepository,
     QueueService,
+    ApiStripeService,
   ],
 })
 export class AdminAccountModule {}

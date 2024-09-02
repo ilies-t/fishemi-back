@@ -15,8 +15,14 @@ export default () => ({
   refreshJwtExpiresIn: process.env.REFRESH_JWT_EXPIRES_IN,
   amqpurl: process.env.AMQP_URL,
   loginQueue: process.env.AMQP_LOGIN_QUEUE,
+  campaignQueue: process.env.AMQP_CAMPAIGN_QUEUE,
   mistralAiBaseUrl: process.env.MISTRAL_AI_BASE_URL,
   mistralAiKey: process.env.MISTRAL_AI_KEY,
-  eurExcludingTaxPricePerEmployee: 3.99,
+  stripePrivateApiKey: process.env.STRIPE_PRIVATE_API_KEY,
+  fishemiWebPaymentConfirmationUrl:
+    process.env.FISHEMI_WEB_PAYMENT_CONFIRMATION_URL,
+  fishemiWebPaymentCancellationUrl:
+    process.env.FISHEMI_WEB_PAYMENT_CANCELLATION_URL,
+  eurExcludingTaxPricePerEmployee: 299.99,
   franceVatRate: 20,
 });

@@ -30,7 +30,11 @@ export class ListRepository {
         },
       },
       include: {
-        employee_lists: true,
+        employee_lists: {
+          include: {
+            employee: true,
+          },
+        },
       },
     });
   }

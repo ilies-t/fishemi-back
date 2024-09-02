@@ -4,11 +4,19 @@ import { CampaignController } from '@controllers/campaign.controller';
 import { CampaignRepository } from '@repositories/campaign.repository';
 import { CampaignService } from '@services/campaign/campaign.service';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
-import { MistralService } from '@services/mistral.service';
+import { ApiMistralService } from '@services/api/api-mistral.service';
 import { CompanyRepository } from '@repositories/company.repository';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CampaignPricingService } from '@services/campaign/campaign-pricing.service';
 import { ListRepository } from '@repositories/list.repository';
+import { ApiStripeService } from '@services/api/api-stripe.service';
+import { AdminAccountService } from '@services/admin-account.service';
+import { AdminAccountRepository } from '@repositories/admin-account.repository';
+import { JwtRefreshService } from '@services/jwt/jwt-refresh.service';
+import { EventService } from '@services/event.service';
+import { EventRepository } from '@repositories/event.repository';
+import { EmployeeRepository } from '@repositories/employee.repository';
+import { QueueService } from '@services/queue.service';
 
 @Module({
   imports: [
@@ -25,10 +33,18 @@ import { ListRepository } from '@repositories/list.repository';
     CampaignRepository,
     PrismaService,
     JwtAccessService,
-    MistralService,
+    JwtRefreshService,
+    ApiMistralService,
+    ApiStripeService,
     CompanyRepository,
     CampaignPricingService,
     ListRepository,
+    EventService,
+    EventRepository,
+    AdminAccountRepository,
+    AdminAccountService,
+    EmployeeRepository,
+    QueueService,
   ],
 })
 export class CampaignModule {}

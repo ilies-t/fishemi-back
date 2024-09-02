@@ -8,8 +8,8 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { MistralAiResponseInterface } from '@interfaces/mistral-ai-response.interface';
 
 @Injectable()
-export class MistralService {
-  private readonly logger = new Logger(MistralService.name);
+export class ApiMistralService {
+  private readonly logger = new Logger(ApiMistralService.name);
   public client: AxiosInstance;
 
   constructor(
@@ -40,7 +40,8 @@ export class MistralService {
             {
               role: 'user',
               content: `
-              Génère un mail formel d'a peu près 100 mots (ne mets pas de sujet ni de signature, juste le texte)
+              Génère un mail formel d'a peu près 100 mots 
+              (ne mets pas de sujet, ne mets pas de signature, ne mets pas de lien ou de mailto, juste le texte) 
               qui invite un employé de l'entreprise "${company.name}" à changer son mot de passe.
               Tu peux utiliser les variables dynamiques suivantes:
               {{employeName}}: Nom de l’employé

@@ -20,7 +20,11 @@ export class AdminAccountRepository {
     });
   }
 
-  public async save(signupDto: SignupDto): Promise<string> {
+  public async save(
+    databaseId: string,
+    stripeId: string,
+    signupDto: SignupDto,
+  ): Promise<string> {
     const otpCode = randomBytes(24).toString('hex');
     const otpCodeExpiration = addMinutes(
       new Date(),
@@ -28,6 +32,7 @@ export class AdminAccountRepository {
     );
     await this.prisma.admin_account.create({
       data: {
+        id: databaseId,
         email: signupDto.email,
         full_name: signupDto.user_full_name,
         roles: [RolesEnum.Admin, RolesEnum.Writer, RolesEnum.Lector].join(','),
@@ -38,6 +43,7 @@ export class AdminAccountRepository {
             name: signupDto.company_name,
           },
         },
+        stripe_id: stripeId,
       },
     });
     return otpCode;
