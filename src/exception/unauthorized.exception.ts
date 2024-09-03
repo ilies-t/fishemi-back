@@ -5,3 +5,8 @@ export class UnauthorizedException extends HttpException {
     super('Unauthorized', HttpStatus.UNAUTHORIZED);
   }
 }
+export class UnauthorizedError extends HttpException {
+  constructor(message?: string) {
+    super(message || 'Unauthorized', HttpStatus.UNAUTHORIZED);
+  }
+}
