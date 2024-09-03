@@ -5,3 +5,9 @@ export class AlreadyExistException extends HttpException {
     super('Already exist', HttpStatus.CONFLICT);
   }
 }
+
+export class AlreadyExistError extends HttpException {
+  constructor(message?: string) {
+    super(message || 'Already exist', HttpStatus.CONFLICT);
+  }
+}
