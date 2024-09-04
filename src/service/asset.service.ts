@@ -37,7 +37,7 @@ export class AssetService {
 
     return new StreamableFile(file, {
       type: 'image/png',
-      disposition: `attachment; filename="${assetName}"`,
+      disposition: 'inline;',
     });
   }
 
