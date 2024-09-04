@@ -115,7 +115,7 @@ INSERT INTO company (id, name) VALUES
   ('b0cbc124-c848-4b48-8ad6-f51e05974363', 'HABENWIR');
 
 INSERT INTO admin_account (full_name, email, roles, company_id, stripe_id) VALUES
-  ('Administrateur', 'administration@pixelgagnant.net', 'admin,writer,lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'test'),
+  ('Administrateur', 'administration@pixelgagnant.net', 'admin,writer,lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', 'cus_QfO3X9jTgpeVAE'),
   ('Stéphanie Test', 'ressources-humaine@pixelgagnant.net', 'lector', 'fd9ec08d-1faa-484b-b98e-b97cc85195a9', null),
   ('Patrick HABENWIR', 'ceo@habenwir.com', 'admin,writer,lector', 'b0cbc124-c848-4b48-8ad6-f51e05974363', 'test-2');
 

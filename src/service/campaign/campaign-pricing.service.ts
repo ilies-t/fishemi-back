@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { CampaignCalculateRequestDto } from '@dto/campaign/campaign-calculate-request.dto';
 import { ListRepository } from '@repositories/list.repository';
-import { campaign_list, employee_list, list } from '@prisma/client';
+import { campaign_list, employee, employee_list, list } from '@prisma/client';
 import { CampaignCalculateResponseDto } from '@dto/campaign/campaign-calculate-response.dto';
 import { BadRequestException } from '@exceptions/bad-request.exception';
 import globalConfig from '@config/global.config';
@@ -29,12 +29,17 @@ export class CampaignPricingService {
     private readonly queueService: QueueService,
   ) {}
 
-  private getAllEmployeeDuplicateSafe(lists: list[]) {
-    return lists
-      .map((item) => item['employee_lists'])
-      .reduce((acc, curr) => acc.concat(curr), [])
-      .map((item: employee_list) => item['employee'].id)
-      .filter((value, index, current) => current.indexOf(value) === index);
+  public getAllEmployeeDuplicateSafe(lists: list[]): employee[] {
+    const employeeMap = new Map<string, employee>();
+    for (const list of lists) {
+      for (const employeeList of list['employee_lists']) {
+        const employee = employeeList.employee;
+        if (!employeeMap.has(employee.id)) {
+          employeeMap.set(employee.id, employee);
+        }
+      }
+    }
+    return Array.from(employeeMap.values());
   }
 
   public async calculate(
