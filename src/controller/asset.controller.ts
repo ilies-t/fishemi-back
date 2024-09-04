@@ -1,4 +1,4 @@
-import { Controller, Get, Param, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Header, Param, StreamableFile } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssetService } from '@services/asset.service';
 import { AuthDisabled } from '@decorators/auth-disabled.decorator';
@@ -9,6 +9,7 @@ export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
   @Get('/cdn/images/logo/100x100/:templateName/:eventId')
+  @Header('Cross-Origin-Resource-Policy', 'cross-origin')
   @ApiOperation({
     summary:
       'Get logo of template name for tracking pixel URL (only used by mailengine)',
