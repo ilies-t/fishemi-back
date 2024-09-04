@@ -3,12 +3,12 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AssetService } from '@services/asset.service';
 import { AuthDisabled } from '@decorators/auth-disabled.decorator';
 
-@Controller('/assets/cdn/images/logo/100x100/')
+@Controller('/assets')
 @ApiTags('Asset')
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
-  @Get('/:templateName/:eventId')
+  @Get('/cdn/images/logo/100x100/:templateName/:eventId')
   @ApiOperation({
     summary:
       'Get logo of template name for tracking pixel URL (only used by mailengine)',
