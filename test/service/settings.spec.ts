@@ -7,7 +7,7 @@ import { SettingsAccountDto } from '@dto/setting/setting.dto';
 import { NotFoundError } from '@exceptions/not-found.exception';
 import { UnauthorizedError } from '@exceptions/unauthorized.exception';
 import { AlreadyExistError } from '@exceptions/already-exist.exception';
-import { CreateManagerDto } from '@dto/setting/setting.dto';
+import { CreateManagerDto } from '@dto/setting/create-manager-setting.dto';
 
 describe('SettingsService', () => {
   let service: SettingsService;
