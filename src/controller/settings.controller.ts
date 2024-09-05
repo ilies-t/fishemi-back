@@ -14,9 +14,9 @@ import {
   ApiOperation,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { SettingsAccountDto } from '@dto/account/setting.dto';
+import { SettingsAccountDto } from '@dto/setting/setting.dto';
 import { SettingsService } from '@services/settings.service';
-import { CreateManagerDto } from '@dto/account/setting.dto';
+import { CreateManagerDto } from '@dto/setting/create-manager-setting.dto';
 
 @Controller('/settings')
 @ApiTags('Settings')
@@ -64,7 +64,7 @@ export class SettingsController {
     @Headers() headers: Headers,
   ): Promise<void> {
     this.logger.log(
-      `Handling createManager, CreateManagerDto=${CreateManagerDto}`,
+      `Handling createManager, CreateManagerDto=${JSON.stringify(createManagerDto)}`,
     );
     return this.settingsService.createManager(headers, createManagerDto);
   }
