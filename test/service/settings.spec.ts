@@ -3,11 +3,11 @@ import { SettingsService } from '@services/settings.service';
 import { CompanyRepository } from '@repositories/company.repository';
 import { AdminAccountRepository } from '@repositories/admin-account.repository';
 import { AdminAccountService } from '@services/admin-account.service';
-import { SettingsAccountDto } from '@dto/account/setting.dto';
+import { SettingsAccountDto } from '@dto/setting/setting.dto';
 import { NotFoundError } from '@exceptions/not-found.exception';
 import { UnauthorizedError } from '@exceptions/unauthorized.exception';
 import { AlreadyExistError } from '@exceptions/already-exist.exception';
-import { CreateManagerDto } from '@dto/account/setting.dto';
+import { CreateManagerDto } from '@dto/setting/setting.dto';
 
 describe('SettingsService', () => {
   let service: SettingsService;

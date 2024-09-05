@@ -103,7 +103,7 @@ CREATE TABLE event (
   campaign_id UUID NOT NULL
 );
 ALTER TABLE event
-  ADD FOREIGN KEY (user_id) REFERENCES employee (id) ON DELETE NO ACTION,
+  ADD FOREIGN KEY (user_id) REFERENCES employee (id) ON DELETE CASCADE,
   ADD FOREIGN KEY (campaign_id) REFERENCES campaign (id) ON DELETE CASCADE;
 
 GRANT USAGE ON SCHEMA public TO fishemi_api_user;
