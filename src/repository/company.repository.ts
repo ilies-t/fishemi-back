@@ -13,4 +13,16 @@ export class CompanyRepository {
       },
     });
   }
+
+  public async update(
+    companyId: string,
+    data: Partial<company>,
+  ): Promise<company> {
+    return this.prisma.company.update({
+      where: {
+        id: companyId,
+      },
+      data: data,
+    });
+  }
 }

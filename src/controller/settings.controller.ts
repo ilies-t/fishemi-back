@@ -7,6 +7,7 @@ import {
   Query,
   Post,
   Body,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -14,7 +15,10 @@ import {
   ApiOperation,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { SettingsAccountDto } from '@dto/setting/setting.dto';
+import {
+  SettingsAccountDto,
+  UpdateSettingsDto,
+} from '@dto/setting/setting.dto';
 import { SettingsService } from '@services/settings.service';
 import { CreateManagerDto } from '@dto/setting/create-manager-setting.dto';
 
@@ -37,6 +41,22 @@ export class SettingsController {
   ): Promise<SettingsAccountDto> {
     this.logger.log(`Handling settings`);
     return this.settingsService.getSettings(headers);
+  }
+
+  @Patch('/')
+  @ApiResponse({ status: 201 })
+  @ApiOperation({
+    summary: 'Update account information for settings page',
+  })
+  @ApiBearerAuth()
+  public async updateSettings(
+    @Body() settingsAccountDto: UpdateSettingsDto,
+    @Headers() headers: Headers,
+  ): Promise<void> {
+    this.logger.log(
+      `Handling updateSettings, SettingsAccountDto=${JSON.stringify(settingsAccountDto)}`,
+    );
+    return this.settingsService.updateSettings(headers, settingsAccountDto);
   }
 
   @Delete('/manager')

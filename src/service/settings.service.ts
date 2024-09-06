@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { CompanyRepository } from '@repositories/company.repository';
 import { AdminAccountRepository } from '@repositories/admin-account.repository';
 import { AdminAccountService } from './admin-account.service';
-import { SettingsAccountDto } from '@dto/setting/setting.dto';
+import {
+  SettingsAccountDto,
+  UpdateSettingsDto,
+} from '@dto/setting/setting.dto';
 import { NotFoundError } from '@exceptions/not-found.exception';
 import { UnauthorizedError } from '@exceptions/unauthorized.exception';
 import { AlreadyExistError } from '@exceptions/already-exist.exception';
@@ -61,5 +64,18 @@ export class SettingsService {
       customer.company_id,
       CreateManagerDto,
     );
+  }
+
+  // update company name from settings page
+  public async updateSettings(
+    headers: Headers,
+    updateSettingsDto: UpdateSettingsDto,
+  ): Promise<void> {
+    const customer = await this.adminAccountService.getCustomer(headers);
+    if (!customer.roles.includes('admin'))
+      throw new UnauthorizedError('Permission denied');
+    await this.companyRepository.update(customer.company_id, {
+      name: updateSettingsDto.company_name,
+    });
   }
 }

@@ -22,3 +22,12 @@ export class SettingsAccountDto {
     this.admins = SettingsAccountAdminsDto.of(admins);
   }
 }
+
+export class UpdateSettingsDto {
+  @ApiProperty()
+  public company_name: string;
+
+  public constructor(company_name: string) {
+    this.company_name = company_name;
+  }
+}
