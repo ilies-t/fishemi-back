@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ListRepository } from '@repositories/list.repository';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
-import { ListDto } from '@dto/list/list.dto';
+import { ListDto, returnListDto } from '@dto/list/list.dto';
 import { CreateListDto } from '@dto/list/create-list.dto';
 import { ManageEmployeeListDto } from '@dto/list/manage-employee-list.dto';
 import { BadRequestException } from '@exceptions/bad-request.exception';
@@ -15,10 +15,10 @@ export class ListService {
     private readonly jwtAccessService: JwtAccessService,
   ) {}
 
-  public async findAll(headers: Headers): Promise<ListDto[]> {
+  public async findAll(headers: Headers): Promise<returnListDto[]> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
     const lists = await this.listRepo.findAll(jwt.companyId);
-    return lists.map((list) => new ListDto(list));
+    return lists.map((list) => new returnListDto(list, list['employee_lists']));
   }
 
   public async create(headers: Headers, body: CreateListDto): Promise<ListDto> {
@@ -80,6 +80,7 @@ export class ListService {
     searchElement: string,
   ): Promise<ListDto[]> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
-    return this.listRepo.search(searchElement, jwt.companyId);
+    const lists = await this.listRepo.search(jwt.companyId, searchElement);
+    return lists.map((list) => new returnListDto(list, list['employee_lists']));
   }
 }

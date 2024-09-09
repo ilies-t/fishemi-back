@@ -1,21 +1,80 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@services/prisma.service';
-import { list, Prisma } from '@prisma/client';
-import { ListDto } from '@dto/list/list.dto';
+import { list } from '@prisma/client';
+import { EmployeeDto } from '@dto/employee/employee.dto';
 
 @Injectable()
 export class ListRepository {
   constructor(private prisma: PrismaService) {}
 
   public async findAll(companyId: string): Promise<list[]> {
-    return this.prisma.list.findMany({
-      where: {
-        company_id: companyId,
-      },
-      include: {
-        employee_lists: true,
-      },
-    });
+    return this.prisma.list
+      .findMany({
+        where: {
+          company_id: companyId,
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((lists) => {
+        return lists.map((list) => ({
+          ...list,
+          employee_lists: list.employee_lists.map((employee_list) =>
+            EmployeeDto.fromEmployee(employee_list.employee),
+          ),
+        }));
+      });
+  }
+
+  public async search(
+    companyId: string,
+    searchString: string,
+  ): Promise<list[]> {
+    return this.prisma.list
+      .findMany({
+        where: {
+          company_id: companyId,
+          name: {
+            contains: searchString,
+          },
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((lists) => {
+        return lists.map((list) => ({
+          ...list,
+          employee_lists: list.employee_lists.map((employee_list) =>
+            EmployeeDto.fromEmployee(employee_list.employee),
+          ),
+        }));
+      });
   }
 
   public async findManyById(
@@ -88,19 +147,5 @@ export class ListRepository {
         },
       },
     });
-  }
-
-  public async search(
-    searchElement: string,
-    companyId: string,
-  ): Promise<ListDto[]> {
-    return this.prisma.$queryRaw<ListDto[]>(Prisma.sql`
-      SELECT list.id, list.name, count(employee_list.id)::int as employee_count
-      FROM list
-        LEFT JOIN employee_list ON list.id = employee_list.list_id
-      WHERE list.company_id = ${companyId}::uuid AND similarity(${searchElement}, list.name) > 0.04
-      GROUP BY list.id
-      ORDER BY similarity(${searchElement}, list.name) DESC;
-    `);
   }
 }
