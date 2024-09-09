@@ -80,6 +80,7 @@ export class ListService {
     searchElement: string,
   ): Promise<ListDto[]> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
-    return this.listRepo.search(searchElement, jwt.companyId);
+    const lists = await this.listRepo.search(jwt.companyId, searchElement);
+    return lists.map((list) => new returnListDto(list, list['employee_lists']));
   }
 }
