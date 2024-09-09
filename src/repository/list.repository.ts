@@ -2,20 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@services/prisma.service';
 import { list, Prisma } from '@prisma/client';
 import { ListDto } from '@dto/list/list.dto';
+import { EmployeeDto } from '@dto/employee/employee.dto';
 
 @Injectable()
 export class ListRepository {
   constructor(private prisma: PrismaService) {}
 
   public async findAll(companyId: string): Promise<list[]> {
-    return this.prisma.list.findMany({
-      where: {
-        company_id: companyId,
-      },
-      include: {
-        employee_lists: true,
-      },
-    });
+    return this.prisma.list
+      .findMany({
+        where: {
+          company_id: companyId,
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((lists) => {
+        return lists.map((list) => ({
+          ...list,
+          employee_lists: list.employee_lists.map((employee_list) =>
+            EmployeeDto.fromEmployee(employee_list.employee),
+          ),
+        }));
+      });
   }
 
   public async findManyById(
