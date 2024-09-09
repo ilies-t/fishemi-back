@@ -13,7 +13,11 @@ export class RoleUtil {
     }
   }
 
+  public static isAdmin(user: admin_account): boolean {
+    return user?.roles?.split(',').includes(RolesEnum.Admin);
+  }
+
   public static haveWriteRole(user: admin_account): boolean {
-    return user.roles.split(',').includes(RolesEnum.Writer);
+    return user?.roles?.split(',').includes(RolesEnum.Writer);
   }
 }
