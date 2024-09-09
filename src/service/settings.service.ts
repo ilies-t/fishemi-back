@@ -10,6 +10,7 @@ import { NotFoundError } from '@exceptions/not-found.exception';
 import { UnauthorizedError } from '@exceptions/unauthorized.exception';
 import { AlreadyExistError } from '@exceptions/already-exist.exception';
 import { CreateManagerDto } from '@dto/setting/create-manager-setting.dto';
+import { RoleUtil } from '@utils/role.util';
 
 @Injectable()
 export class SettingsService {
@@ -19,14 +20,15 @@ export class SettingsService {
     private readonly adminAccountService: AdminAccountService,
   ) {}
 
-  // get user email, companyname and other admins list for settings page
+  // get user email, company name and other admins list for settings page
   public async getSettings(headers: Headers): Promise<SettingsAccountDto> {
     const customer = await this.adminAccountService.getCustomer(headers);
     if (!customer.roles.includes('admin'))
       throw new UnauthorizedError('Permission denied');
-    const admins = await this.adminAccountRepository.findAllFromCompany(
+    let admins = await this.adminAccountRepository.findAllFromCompany(
       customer.company_id,
     );
+    admins = admins.filter((managers) => !RoleUtil.isAdmin(managers));
     const company = await this.companyRepository.findById(customer.company_id);
     return new SettingsAccountDto(customer.email, company.name, admins);
   }
@@ -44,6 +46,11 @@ export class SettingsService {
       company_id: customer.company_id,
     });
     if (!manager) throw new NotFoundError('Manager not found');
+
+    // check that the manager to delete is not the admin
+    if (RoleUtil.isAdmin(manager)) {
+      throw new UnauthorizedError('Cannot delete admin');
+    }
     await this.adminAccountRepository.delete(managerId);
   }
 
@@ -58,7 +65,7 @@ export class SettingsService {
     const managerExists = await this.adminAccountRepository.findUnique({
       email: CreateManagerDto.email,
     });
-    if (managerExists && managerExists.id)
+    if (managerExists?.id)
       throw new AlreadyExistError('Manager already exists');
     await this.adminAccountRepository.createManager(
       customer.company_id,
