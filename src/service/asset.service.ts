@@ -1,7 +1,7 @@
 import { Injectable, Logger, StreamableFile } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { CampaignStatusEnum } from '@enumerators/template.enum';
+import { TemplateEnum } from '@enumerators/template.enum';
 import { validate as isValidUUID } from 'uuid';
 import { EventRepository } from '@repositories/event.repository';
 import { EventEnum } from '@enumerators/event-type.enum';
@@ -82,9 +82,9 @@ export class AssetService {
     }
 
     switch (templateName.toLowerCase()) {
-      case CampaignStatusEnum.Google.toLowerCase():
+      case TemplateEnum.Google.toLowerCase():
         return 'google.png';
-      case CampaignStatusEnum.Microsoft.toLowerCase():
+      case TemplateEnum.Microsoft.toLowerCase():
         return 'microsoft.png';
       default:
         return 'plain.png';

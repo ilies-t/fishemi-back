@@ -106,4 +106,12 @@ export class CampaignRepository {
       },
     });
   }
+
+  public async deleteCampaign(id: string) {
+    await this.prisma.campaign.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

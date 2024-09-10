@@ -6,6 +6,7 @@ import { DetailedCampaignDto } from '@dto/campaign/detailed-campaign.dto';
 import { BadRequestException } from '@exceptions/bad-request.exception';
 import { NewCampaignDto } from '@dto/campaign/new-campaign.dto';
 import { campaign } from '@prisma/client';
+import { CampaignStatusEnum } from '@enumerators/campaign-status.enum';
 
 @Injectable()
 export class CampaignService {
@@ -53,5 +54,18 @@ export class CampaignService {
     const campaign = await this.campaignRepo.create(jwt.companyId, body);
     this.logger.log(`Campaign successfully created, id=${campaign.id}`);
     return CampaignDto.of(campaign);
+  }
+
+  public async deleteCampaign(headers: Headers, id: string): Promise<void> {
+    const campaign = await this.getOneCampaign(headers, { id });
+    if (campaign.status !== CampaignStatusEnum.Draft) {
+      this.logger.error(
+        `Campaign cannot be deleted, id=${id}, status=${campaign.status}`,
+      );
+      throw new BadRequestException(
+        'Vous ne pouvez pas supprimer cette campagne',
+      );
+    }
+    await this.campaignRepo.deleteCampaign(id);
   }
 }
