@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CampaignStatusEnum } from '@enumerators/template.enum';
+import { TemplateEnum } from '@enumerators/template.enum';
 import { IsEnum, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class NewCampaignDto {
@@ -12,9 +12,9 @@ export class NewCampaignDto {
   @ApiProperty()
   public name: string;
 
-  @IsEnum(CampaignStatusEnum)
-  @ApiProperty({ example: CampaignStatusEnum.Microsoft })
-  public template: CampaignStatusEnum;
+  @IsEnum(TemplateEnum)
+  @ApiProperty({ example: TemplateEnum.Microsoft })
+  public template: TemplateEnum;
 
   @IsString()
   @MaxLength(255)

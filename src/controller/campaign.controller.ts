@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Logger,
@@ -150,6 +151,22 @@ export class CampaignController {
     );
     return this.campaignPricingService
       .validateCheckout(headers, paymentStripeId)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @RoleRestricted()
+  @Delete('/delete')
+  @ApiOperation({
+    summary: 'Delete one campaign by ID (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  public async deleteCampaign(
+    @Headers() headers: Headers,
+    @Query('id') id: string,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(`Handling delete campaign, id=${id}`);
+    return this.campaignService
+      .deleteCampaign(headers, id)
       .then(() => GenericResponseDto.ok());
   }
 }
