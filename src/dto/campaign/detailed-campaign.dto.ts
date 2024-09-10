@@ -15,9 +15,6 @@ class CampaignStat {
   @ApiProperty()
   public total_opened: number;
 
-  @ApiProperty()
-  public total_submit_form: number;
-
   public static fromEvents(campaign: campaign): CampaignStat {
     const stat = new CampaignStat();
     stat.total = campaign['campaign_lists'].reduce(
@@ -32,10 +29,6 @@ class CampaignStat {
     stat.total_opened = CampaignStat.getTotalsEventFiltered(
       campaign['events'],
       EventEnum.Opened,
-    );
-    stat.total_submit_form = CampaignStat.getTotalsEventFiltered(
-      campaign['events'],
-      EventEnum.FormSubmitted,
     );
     return stat;
   }

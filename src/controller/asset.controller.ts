@@ -23,4 +23,15 @@ export class AssetController {
   ): Promise<StreamableFile> {
     return this.assetService.getAsset(templateName, eventId);
   }
+
+  @Get('/:companyName/sso/my-account/update-credentials/:eventId')
+  @ApiOperation({
+    summary: 'Handle email form click (only used by mailengine)',
+  })
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 400 })
+  @AuthDisabled()
+  public async clickForm(@Param('eventId') eventId: string): Promise<string> {
+    return this.assetService.handleClickForm(eventId);
+  }
 }
