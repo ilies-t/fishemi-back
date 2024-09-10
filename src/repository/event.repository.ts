@@ -45,6 +45,13 @@ export class EventRepository {
       where: {
         id: eventId,
       },
+      include: {
+        campaign: {
+          include: {
+            company: true,
+          },
+        },
+      },
     });
   }
 }

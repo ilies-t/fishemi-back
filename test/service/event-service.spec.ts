@@ -23,7 +23,7 @@ describe('EventService', () => {
         getMockEvent('2024-07-05T11:00', EventEnum.Clicked),
         getMockEvent('2024-07-04T11:00', EventEnum.Clicked),
         getMockEvent('2024-07-04T20:57', EventEnum.Clicked),
-        getMockEvent('2024-07-04T20:59', EventEnum.OpenedForm),
+        getMockEvent('2024-07-04T20:59', EventEnum.Opened),
         getMockEvent('2024-07-02T20:59', EventEnum.Clicked),
         getMockEvent('2024-06-30T07:44', EventEnum.Sent),
         getMockEvent('2024-06-28T07:44', EventEnum.Clicked),
