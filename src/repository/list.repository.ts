@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@services/prisma.service';
 import { list } from '@prisma/client';
 import { EmployeeDto } from '@dto/employee/employee.dto';
+import { NotFoundError } from '@exceptions/not-found.exception';
 
 @Injectable()
 export class ListRepository {
@@ -147,5 +148,26 @@ export class ListRepository {
         },
       },
     });
+  }
+
+  public async checkListsExists(
+    companyId: string,
+    lists: string[],
+  ): Promise<void> {
+    const existingLists = await this.prisma.list.findMany({
+      where: {
+        company_id: companyId,
+        id: {
+          in: lists,
+        },
+      },
+    });
+    if (existingLists.length !== lists.length) {
+      throw new NotFoundError(
+        "Provided lists doesn't exists or doesn't have any employee",
+      );
+    }
+
+    return;
   }
 }

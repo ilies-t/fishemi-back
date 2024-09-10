@@ -26,3 +26,9 @@ export class NewCampaignDto {
   @ApiProperty()
   public content: string;
 }
+
+export class updateCampaignDto extends NewCampaignDto {
+  @IsUUID()
+  @ApiProperty()
+  public id: string;
+}
