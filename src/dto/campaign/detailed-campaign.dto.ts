@@ -76,13 +76,13 @@ export class DetailedCampaignDto extends CampaignDto {
   @ApiProperty()
   public template: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: ListDto, isArray: true })
   public lists: ListDto[];
 
   @ApiProperty()
   public stats: CampaignStat;
 
-  @ApiProperty()
+  @ApiProperty({ type: CampaignEventDto, isArray: true })
   public events: CampaignEventDto[];
 
   public static detailedOf(campaign: campaign): DetailedCampaignDto {
