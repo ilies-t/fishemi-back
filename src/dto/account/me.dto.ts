@@ -36,11 +36,19 @@ export class EventsStatsDto {
   @ApiProperty({ type: MeClickedEventDto, isArray: true })
   public total_clicked: MeClickedEventDto[];
 
+  @ApiProperty({ type: MeClickedEventDto, isArray: true })
+  public total_opened: MeClickedEventDto[];
+
   @ApiProperty()
   public total_today: number;
 
-  public constructor(total_clicked: MeClickedEventDto[], total_today: number) {
+  public constructor(
+    total_clicked: MeClickedEventDto[],
+    total_opened: MeClickedEventDto[],
+    total_today: number,
+  ) {
     this.total_clicked = total_clicked;
+    this.total_opened = total_opened;
     this.total_today = total_today;
   }
 }
