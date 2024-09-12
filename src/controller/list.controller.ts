@@ -5,6 +5,7 @@ import {
   Get,
   Headers,
   Logger,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -15,7 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ListService } from '@services/list.service';
-import { ListDto } from '@dto/list/list.dto';
+import { ListDto, returnListDto, UpdateListDto } from '@dto/list/list.dto';
 import { CreateListDto } from '@dto/list/create-list.dto';
 import { GenericResponseDto } from '@dto/generic-response.dto';
 import { ManageEmployeeListDto } from '@dto/list/manage-employee-list.dto';
@@ -32,9 +33,20 @@ export class ListController {
   @Get()
   @ApiOperation({ summary: 'Get all user lists' })
   @ApiResponse({ status: 200, type: ListDto, isArray: true })
-  public async findAll(@Headers() headers: Headers): Promise<ListDto[]> {
+  public async findAll(@Headers() headers: Headers): Promise<returnListDto[]> {
     this.logger.log(`Handling findAll list`);
     return this.listService.findAll(headers);
+  }
+
+  @Patch('/')
+  @ApiOperation({ summary: 'Update list' })
+  @ApiResponse({ status: 200, type: returnListDto })
+  public async update(
+    @Headers() headers: Headers,
+    @Body() body: UpdateListDto,
+  ): Promise<returnListDto> {
+    this.logger.log(`Handling update list, listId=${body.id}`);
+    return this.listService.update(headers, body);
   }
 
   @RoleRestricted()
@@ -88,7 +100,7 @@ export class ListController {
   public async search(
     @Headers() headers: Headers,
     @Query('name') searchElement: string,
-  ): Promise<ListDto[]> {
+  ): Promise<returnListDto[]> {
     this.logger.log(`Handling search list, searchElement=${searchElement}`);
     return this.listService.search(headers, searchElement);
   }
