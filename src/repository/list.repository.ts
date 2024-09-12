@@ -3,10 +3,15 @@ import { PrismaService } from '@services/prisma.service';
 import { list } from '@prisma/client';
 import { EmployeeDto } from '@dto/employee/employee.dto';
 import { NotFoundError } from '@exceptions/not-found.exception';
+import { UpdateListDto } from '@dto/list/list.dto';
+import { EmployeeRepository } from '@repositories/employee.repository';
 
 @Injectable()
 export class ListRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private employeeRepo: EmployeeRepository,
+  ) {}
 
   public async findAll(companyId: string): Promise<list[]> {
     return this.prisma.list
@@ -38,6 +43,37 @@ export class ListRepository {
           ),
         }));
       });
+  }
+
+  public async findById(companyId: string, listId: string): Promise<list> {
+    return this.prisma.list
+      .findUnique({
+        where: {
+          id: listId,
+          company_id: companyId,
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((list) => ({
+        ...list,
+        employee_lists: list.employee_lists.map((employee_list) =>
+          EmployeeDto.fromEmployee(employee_list.employee),
+        ),
+      }));
   }
 
   public async search(
@@ -169,5 +205,83 @@ export class ListRepository {
     }
 
     return;
+  }
+
+  public async update(companyId: string, list: UpdateListDto): Promise<list> {
+    return this.prisma.list.update({
+      where: {
+        id: list.id,
+        company_id: companyId,
+      },
+      data: {
+        name: list.name,
+      },
+    });
+  }
+
+  public async updateEmployeeList(
+    list: UpdateListDto,
+    company_id: string,
+  ): Promise<void> {
+    const employeeIds = list.employee_ids;
+    const employeeLists = await this.prisma.employee_list.findMany({
+      select: {
+        id: true,
+        employee_id: true,
+      },
+      where: {
+        list_id: list.id,
+      },
+    });
+
+    await this.employeeRepo.checkEmployeesExists(company_id, employeeIds);
+
+    const idsToDelete = employeeLists
+      .filter((employeeList) => !employeeIds.includes(employeeList.employee_id))
+      .map((employeeList) => employeeList.id);
+    const idsToAdd = employeeIds
+      .filter(
+        (employeeId) =>
+          !employeeLists
+            .map((employeeList) => employeeList.employee_id)
+            .includes(employeeId),
+      )
+      .map((employeeId) => ({
+        list_id: list.id,
+        employee_id: employeeId,
+      }));
+
+    await this.prisma.employee_list.deleteMany({
+      where: {
+        id: {
+          in: idsToDelete,
+        },
+      },
+    });
+
+    await this.prisma.employee_list.createMany({
+      data: idsToAdd.map((id) => ({
+        list_id: id.list_id,
+        employee_id: id.employee_id,
+      })),
+    });
+  }
+
+  public async delete(companyId: string, listId: string): Promise<void> {
+    await this.prisma.list.delete({
+      where: {
+        id: listId,
+        company_id: companyId,
+      },
+    });
+  }
+
+  public async checkListIsUsedInCampaign(listId: string): Promise<boolean> {
+    const campaign = await this.prisma.campaign_list.findFirst({
+      where: {
+        list_id: listId,
+      },
+    });
+    return campaign !== null;
   }
 }

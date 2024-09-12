@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AdminAccountRepository } from '@repositories/admin-account.repository';
 import { RoleUtil } from '@utils/role.util';
-import { BadRequestException } from '@exceptions/bad-request.exception';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
 import { ForbiddenException } from '@exceptions/forbidden.exception';
 

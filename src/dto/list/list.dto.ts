@@ -33,3 +33,14 @@ export class returnListDto extends ListDto {
     this.employee_lists = employee_lists;
   }
 }
+
+export class UpdateListDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  employee_ids: string[];
+}

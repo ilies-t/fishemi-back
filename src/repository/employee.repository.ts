@@ -3,6 +3,7 @@ import { PrismaService } from '@services/prisma.service';
 import { employee, Prisma } from '@prisma/client';
 import { EmployeeListDto } from '@dto/employee/employee-list.dto';
 import { EmployeeDto } from '@dto/employee/employee.dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class EmployeeRepository {
@@ -70,5 +71,23 @@ export class EmployeeRepository {
         company_id: companyId,
       },
     });
+  }
+
+  public async checkEmployeesExists(
+    companyId: string,
+    employeeIds: string[],
+  ): Promise<void> {
+    const employees = await this.prisma.employee.findMany({
+      where: {
+        id: { in: employeeIds },
+        company_id: companyId,
+      },
+    });
+
+    if (employees.length !== employeeIds.length) {
+      throw new UnauthorizedException('Some employees do not exist');
+    }
+
+    return;
   }
 }

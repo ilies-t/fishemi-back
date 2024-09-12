@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ListRepository } from '@repositories/list.repository';
 import { JwtAccessService } from '@services/jwt/jwt-access.service';
-import { ListDto, returnListDto } from '@dto/list/list.dto';
+import { ListDto, returnListDto, UpdateListDto } from '@dto/list/list.dto';
 import { CreateListDto } from '@dto/list/create-list.dto';
 import { ManageEmployeeListDto } from '@dto/list/manage-employee-list.dto';
 import { BadRequestException } from '@exceptions/bad-request.exception';
@@ -78,9 +78,34 @@ export class ListService {
   public async search(
     headers: Headers,
     searchElement: string,
-  ): Promise<ListDto[]> {
+  ): Promise<returnListDto[]> {
     const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
     const lists = await this.listRepo.search(jwt.companyId, searchElement);
     return lists.map((list) => new returnListDto(list, list['employee_lists']));
+  }
+
+  public async update(
+    headers: Headers,
+    body: UpdateListDto,
+  ): Promise<returnListDto> {
+    const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
+    const list = await this.listRepo.update(jwt.companyId, body);
+    this.logger.log(`List name successfully updated, id=${list.id}`);
+    await this.listRepo.updateEmployeeList(body, jwt.companyId);
+    const updatedList = await this.listRepo.findById(jwt.companyId, list.id);
+    return new returnListDto(updatedList, updatedList['employee_lists']);
+  }
+
+  public async delete(headers: Headers, listId: string): Promise<void> {
+    const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
+    // check if list is used in any campaign
+    const isUsed = await this.listRepo.checkListIsUsedInCampaign(listId);
+    if (isUsed) {
+      throw new BadRequestException(
+        'La liste est utilisée dans une campagne, impossible de la supprimer.',
+      );
+    }
+    await this.listRepo.delete(jwt.companyId, listId);
+    this.logger.log(`List successfully deleted, id=${listId}`);
   }
 }
