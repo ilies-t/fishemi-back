@@ -62,6 +62,20 @@ export class ListController {
   }
 
   @RoleRestricted()
+  @Delete('/')
+  @ApiOperation({ summary: 'Delete a list (only writers role)' })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  public async delete(
+    @Headers() headers: Headers,
+    @Query('id') listId: string,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(`Handling delete list, listId=${listId}`);
+    return this.listService
+      .delete(headers, listId)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @RoleRestricted()
   @Post('/employee')
   @ApiOperation({ summary: 'Add employee into a list (only writers role)' })
   public async addEmployee(

@@ -95,4 +95,17 @@ export class ListService {
     const updatedList = await this.listRepo.findById(jwt.companyId, list.id);
     return new returnListDto(updatedList, updatedList['employee_lists']);
   }
+
+  public async delete(headers: Headers, listId: string): Promise<void> {
+    const jwt = this.jwtAccessService.getJwtFromHeaders(headers);
+    // check if list is used in any campaign
+    const isUsed = await this.listRepo.checkListIsUsedInCampaign(listId);
+    if (isUsed) {
+      throw new BadRequestException(
+        'La liste est utilisée dans une campagne, impossible de la supprimer.',
+      );
+    }
+    await this.listRepo.delete(jwt.companyId, listId);
+    this.logger.log(`List successfully deleted, id=${listId}`);
+  }
 }

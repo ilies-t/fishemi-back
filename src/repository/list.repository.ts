@@ -266,4 +266,22 @@ export class ListRepository {
       })),
     });
   }
+
+  public async delete(companyId: string, listId: string): Promise<void> {
+    await this.prisma.list.delete({
+      where: {
+        id: listId,
+        company_id: companyId,
+      },
+    });
+  }
+
+  public async checkListIsUsedInCampaign(listId: string): Promise<boolean> {
+    const campaign = await this.prisma.campaign_list.findFirst({
+      where: {
+        list_id: listId,
+      },
+    });
+    return campaign !== null;
+  }
 }
