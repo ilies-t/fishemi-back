@@ -4,6 +4,7 @@ import { ListRepository } from '@repositories/list.repository';
 import { CampaignPricingService } from '@services/campaign/campaign-pricing.service';
 import { JwtInterface } from '@interfaces/jwt.interface';
 import { BadRequestException } from '@exceptions/bad-request.exception';
+import { EmployeeRepository } from '@repositories/employee.repository';
 import globalConfig from '@config/global.config';
 
 describe('CampaignPricingService', () => {
@@ -13,7 +14,10 @@ describe('CampaignPricingService', () => {
 
   beforeEach(() => {
     jwtAccessService = new JwtAccessService();
-    listRepo = new ListRepository(new PrismaService());
+    listRepo = new ListRepository(
+      new PrismaService(),
+      new EmployeeRepository(new PrismaService()),
+    );
     campaignPricingService = new CampaignPricingService(
       jwtAccessService,
       listRepo,
