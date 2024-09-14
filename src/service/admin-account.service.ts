@@ -15,6 +15,7 @@ import { CampaignRepository } from '@repositories/campaign.repository';
 import globalConfig from '@config/global.config';
 import { ApiStripeService } from '@services/api/api-stripe.service';
 import { admin_account } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AdminAccountService {
@@ -80,7 +81,7 @@ export class AdminAccountService {
       );
       throw new AlreadyExistException();
     }
-    const databaseId = crypto.randomUUID();
+    const databaseId = uuidv4();
     const stripeId = await this.apiStripeService.createCustomer(
       databaseId.toString(),
       signupDto.email.toLowerCase(),

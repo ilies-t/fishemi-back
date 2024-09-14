@@ -7,6 +7,7 @@ import { EmployeeModule } from '@config/employee.module';
 import { ListModule } from '@config/list.module';
 import { CampaignModule } from '@config/campaign.module';
 import { AssetModule } from '@config/asset.module';
+import { SettingsModule } from '@config/settings.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AssetModule } from '@config/asset.module';
     ListModule,
     CampaignModule,
     AssetModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}

@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import globalConfig from '@config/global.config';
 import * as dayjs from 'dayjs';
-import { NumberUtil } from '@utils/number.util';
 
 @Injectable()
 export class ApiStripeService {
@@ -10,7 +9,10 @@ export class ApiStripeService {
   public stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(globalConfig().stripePrivateApiKey);
+    this.stripe = new Stripe(globalConfig().stripePrivateApiKey, {
+      maxNetworkRetries: 5,
+      httpClient: Stripe.createFetchHttpClient(),
+    });
   }
 
   public async createCustomer(
@@ -18,12 +20,17 @@ export class ApiStripeService {
     email: string,
     name: string,
   ): Promise<string> {
-    const client = await this.stripe.customers.create({
-      email,
-      metadata: { databaseId },
-      name,
-    });
-    return client.id;
+    try {
+      const client = await this.stripe.customers.create({
+        email,
+        metadata: { databaseId },
+        name,
+      });
+      return client.id;
+    } catch (error) {
+      this.logger.error(`Stripe failed to create customer`, error);
+      throw error;
+    }
   }
 
   public async newCheckout(

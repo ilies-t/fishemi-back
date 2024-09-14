@@ -106,4 +106,37 @@ export class CampaignRepository {
       },
     });
   }
+
+  public async deleteCampaign(id: string) {
+    await this.prisma.campaign.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  public async updateCampaign(
+    id: string,
+    body: NewCampaignDto,
+  ): Promise<campaign> {
+    return this.prisma.campaign.update({
+      where: {
+        id,
+      },
+      data: {
+        name: body.name,
+        template: body.template,
+        subject: body.subject,
+        content: body.content,
+        campaign_lists: {
+          deleteMany: {},
+          create: body.lists.map((list) => {
+            return {
+              list_id: list,
+            };
+          }),
+        },
+      },
+    });
+  }
 }

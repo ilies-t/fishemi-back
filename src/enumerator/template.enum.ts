@@ -1,4 +1,4 @@
-export enum CampaignStatusEnum {
+export enum TemplateEnum {
   Plain = 'PLAIN',
   Google = 'GOOGLE',
   Microsoft = 'MICROSOFT',

@@ -1,21 +1,117 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@services/prisma.service';
-import { list, Prisma } from '@prisma/client';
-import { ListDto } from '@dto/list/list.dto';
+import { list } from '@prisma/client';
+import { EmployeeDto } from '@dto/employee/employee.dto';
+import { NotFoundError } from '@exceptions/not-found.exception';
+import { UpdateListDto } from '@dto/list/list.dto';
+import { EmployeeRepository } from '@repositories/employee.repository';
 
 @Injectable()
 export class ListRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private employeeRepo: EmployeeRepository,
+  ) {}
 
   public async findAll(companyId: string): Promise<list[]> {
-    return this.prisma.list.findMany({
-      where: {
-        company_id: companyId,
-      },
-      include: {
-        employee_lists: true,
-      },
-    });
+    return this.prisma.list
+      .findMany({
+        where: {
+          company_id: companyId,
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((lists) => {
+        return lists.map((list) => ({
+          ...list,
+          employee_lists: list.employee_lists.map((employee_list) =>
+            EmployeeDto.fromEmployee(employee_list.employee),
+          ),
+        }));
+      });
+  }
+
+  public async findById(companyId: string, listId: string): Promise<list> {
+    return this.prisma.list
+      .findUnique({
+        where: {
+          id: listId,
+          company_id: companyId,
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((list) => ({
+        ...list,
+        employee_lists: list.employee_lists.map((employee_list) =>
+          EmployeeDto.fromEmployee(employee_list.employee),
+        ),
+      }));
+  }
+
+  public async search(
+    companyId: string,
+    searchString: string,
+  ): Promise<list[]> {
+    return this.prisma.list
+      .findMany({
+        where: {
+          company_id: companyId,
+          name: {
+            contains: searchString,
+          },
+        },
+        include: {
+          employee_lists: {
+            include: {
+              employee: {
+                select: {
+                  id: true,
+                  created_at: true,
+                  email: true,
+                  full_name: true,
+                  company_id: true,
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((lists) => {
+        return lists.map((list) => ({
+          ...list,
+          employee_lists: list.employee_lists.map((employee_list) =>
+            EmployeeDto.fromEmployee(employee_list.employee),
+          ),
+        }));
+      });
   }
 
   public async findManyById(
@@ -90,17 +186,102 @@ export class ListRepository {
     });
   }
 
-  public async search(
-    searchElement: string,
+  public async checkListsExists(
     companyId: string,
-  ): Promise<ListDto[]> {
-    return this.prisma.$queryRaw<ListDto[]>(Prisma.sql`
-      SELECT list.id, list.name, count(employee_list.id)::int as employee_count
-      FROM list
-        LEFT JOIN employee_list ON list.id = employee_list.list_id
-      WHERE list.company_id = ${companyId}::uuid AND similarity(${searchElement}, list.name) > 0.04
-      GROUP BY list.id
-      ORDER BY similarity(${searchElement}, list.name) DESC;
-    `);
+    lists: string[],
+  ): Promise<void> {
+    const existingLists = await this.prisma.list.findMany({
+      where: {
+        company_id: companyId,
+        id: {
+          in: lists,
+        },
+      },
+    });
+    if (existingLists.length !== lists.length) {
+      throw new NotFoundError(
+        "Provided lists doesn't exists or doesn't have any employee",
+      );
+    }
+
+    return;
+  }
+
+  public async update(companyId: string, list: UpdateListDto): Promise<list> {
+    return this.prisma.list.update({
+      where: {
+        id: list.id,
+        company_id: companyId,
+      },
+      data: {
+        name: list.name,
+      },
+    });
+  }
+
+  public async updateEmployeeList(
+    list: UpdateListDto,
+    company_id: string,
+  ): Promise<void> {
+    const employeeIds = list.employee_ids;
+    const employeeLists = await this.prisma.employee_list.findMany({
+      select: {
+        id: true,
+        employee_id: true,
+      },
+      where: {
+        list_id: list.id,
+      },
+    });
+
+    await this.employeeRepo.checkEmployeesExists(company_id, employeeIds);
+
+    const idsToDelete = employeeLists
+      .filter((employeeList) => !employeeIds.includes(employeeList.employee_id))
+      .map((employeeList) => employeeList.id);
+    const idsToAdd = employeeIds
+      .filter(
+        (employeeId) =>
+          !employeeLists
+            .map((employeeList) => employeeList.employee_id)
+            .includes(employeeId),
+      )
+      .map((employeeId) => ({
+        list_id: list.id,
+        employee_id: employeeId,
+      }));
+
+    await this.prisma.employee_list.deleteMany({
+      where: {
+        id: {
+          in: idsToDelete,
+        },
+      },
+    });
+
+    await this.prisma.employee_list.createMany({
+      data: idsToAdd.map((id) => ({
+        list_id: id.list_id,
+        employee_id: id.employee_id,
+      })),
+    });
+  }
+
+  public async delete(companyId: string, listId: string): Promise<void> {
+    await this.prisma.list.delete({
+      where: {
+        id: listId,
+        company_id: companyId,
+      },
+    });
+  }
+
+  public async checkListIsUsedInCampaign(listId: string): Promise<boolean> {
+    const campaign = await this.prisma.campaign_list.findFirst({
+      where: {
+        list_id: listId,
+      },
+    });
+    return campaign !== null;
   }
 }

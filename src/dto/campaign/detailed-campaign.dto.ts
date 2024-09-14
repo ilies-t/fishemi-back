@@ -1,14 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CampaignDto } from '@dto/campaign/campaign.dto';
-import { campaign, event, campaign_list } from '@prisma/client';
+import { campaign, event } from '@prisma/client';
 import { ListDto } from '@dto/list/list.dto';
 import { CampaignStatusEnum } from '@enumerators/campaign-status.enum';
 import { EventEnum } from '@enumerators/event-type.enum';
 
 class CampaignStat {
-  @ApiProperty()
-  public total: number;
-
   @ApiProperty()
   public total_sent: number;
 
@@ -16,15 +13,10 @@ class CampaignStat {
   public total_opened: number;
 
   @ApiProperty()
-  public total_submit_form: number;
+  public total_clicked: number;
 
   public static fromEvents(campaign: campaign): CampaignStat {
     const stat = new CampaignStat();
-    stat.total = campaign['campaign_lists'].reduce(
-      (sum: number, x: campaign_list) =>
-        x['list']['employee_lists'].length + sum,
-      0,
-    );
     stat.total_sent = CampaignStat.getTotalsEventFiltered(
       campaign['events'],
       EventEnum.Sent,
@@ -33,9 +25,9 @@ class CampaignStat {
       campaign['events'],
       EventEnum.Opened,
     );
-    stat.total_submit_form = CampaignStat.getTotalsEventFiltered(
+    stat.total_clicked = CampaignStat.getTotalsEventFiltered(
       campaign['events'],
-      EventEnum.FormSubmitted,
+      EventEnum.Clicked,
     );
     return stat;
   }
@@ -84,13 +76,13 @@ export class DetailedCampaignDto extends CampaignDto {
   @ApiProperty()
   public template: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: ListDto, isArray: true })
   public lists: ListDto[];
 
   @ApiProperty()
   public stats: CampaignStat;
 
-  @ApiProperty()
+  @ApiProperty({ type: CampaignEventDto, isArray: true })
   public events: CampaignEventDto[];
 
   public static detailedOf(campaign: campaign): DetailedCampaignDto {

@@ -1,5 +1,6 @@
 import { campaign_list, list } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { EmployeeDto } from '@dto/employee/employee.dto';
 
 export class ListDto {
   @ApiProperty()
@@ -22,4 +23,24 @@ export class ListDto {
   public static fromCampaignList(campaignList: campaign_list): ListDto {
     return new ListDto(campaignList['list']);
   }
+}
+
+export class returnListDto extends ListDto {
+  employee_lists: EmployeeDto[];
+
+  constructor(list: list, employee_lists: EmployeeDto[] = []) {
+    super(list);
+    this.employee_lists = employee_lists;
+  }
+}
+
+export class UpdateListDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  employee_ids: string[];
 }

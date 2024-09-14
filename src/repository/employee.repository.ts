@@ -3,6 +3,7 @@ import { PrismaService } from '@services/prisma.service';
 import { employee, Prisma } from '@prisma/client';
 import { EmployeeListDto } from '@dto/employee/employee-list.dto';
 import { EmployeeDto } from '@dto/employee/employee.dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class EmployeeRepository {
@@ -31,7 +32,7 @@ export class EmployeeRepository {
     return this.prisma.$queryRaw<EmployeeListDto[]>(Prisma.sql`
       SELECT employee.id, employee.email, employee.full_name
       FROM employee
-      WHERE employee.company_id = ${companyId}::uuid AND similarity(${searchElement}, employee.full_name) > 0.04
+      WHERE employee.company_id = ${companyId}::uuid AND similarity(${searchElement}, employee.full_name) > 0.15
       ORDER BY similarity(${searchElement}, employee.full_name) DESC;
     `);
   }
@@ -45,7 +46,7 @@ export class EmployeeRepository {
       SELECT employee.id, employee.email, employee.full_name, employee_list.id IS NOT NULL AS is_present_in_list
       FROM employee
         LEFT JOIN employee_list ON employee.id = employee_list.employee_id AND employee_list.list_id = ${listFilter}::uuid
-      WHERE employee.company_id = ${companyId} AND similarity(${searchElement}, employee.full_name) > 0.04
+      WHERE employee.company_id = ${companyId} AND similarity(${searchElement}, employee.full_name) > 0.15
       ORDER BY similarity(${searchElement}, employee.full_name) DESC;
     `);
   }
@@ -70,5 +71,23 @@ export class EmployeeRepository {
         company_id: companyId,
       },
     });
+  }
+
+  public async checkEmployeesExists(
+    companyId: string,
+    employeeIds: string[],
+  ): Promise<void> {
+    const employees = await this.prisma.employee.findMany({
+      where: {
+        id: { in: employeeIds },
+        company_id: companyId,
+      },
+    });
+
+    if (employees.length !== employeeIds.length) {
+      throw new UnauthorizedException('Some employees do not exist');
+    }
+
+    return;
   }
 }

@@ -23,7 +23,9 @@ describe('EventService', () => {
         getMockEvent('2024-07-05T11:00', EventEnum.Clicked),
         getMockEvent('2024-07-04T11:00', EventEnum.Clicked),
         getMockEvent('2024-07-04T20:57', EventEnum.Clicked),
-        getMockEvent('2024-07-04T20:59', EventEnum.OpenedForm),
+        getMockEvent('2024-07-04T20:59', EventEnum.Opened),
+        getMockEvent('2024-07-04T21:24', EventEnum.Opened),
+        getMockEvent('2024-07-04T21:25', EventEnum.Opened),
         getMockEvent('2024-07-02T20:59', EventEnum.Clicked),
         getMockEvent('2024-06-30T07:44', EventEnum.Sent),
         getMockEvent('2024-06-28T07:44', EventEnum.Clicked),
@@ -42,6 +44,7 @@ describe('EventService', () => {
     expect(result.total_clicked[1]).toEqual(new MeClickedEventDto('04 Jul', 2));
     expect(result.total_clicked[5]).toEqual(new MeClickedEventDto('30 Jun', 0));
     expect(result.total_clicked[7]).toEqual(new MeClickedEventDto('28 Jun', 1));
+    expect(result.total_opened[1]).toEqual(new MeClickedEventDto('04 Jul', 3));
     expect(result.total_today).toEqual(1);
   });
 });

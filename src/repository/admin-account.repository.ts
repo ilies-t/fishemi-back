@@ -6,6 +6,8 @@ import { SignupDto } from '@dto/account/signup.dto';
 import { randomBytes } from 'node:crypto';
 import { addMinutes } from 'date-fns';
 import globalConfig from '@config/global.config';
+import { CreateManagerDto } from '@dto/setting/create-manager-setting.dto';
+import { BadRequestException } from '@exceptions/bad-request.exception';
 
 @Injectable()
 export class AdminAccountRepository {
@@ -49,6 +51,27 @@ export class AdminAccountRepository {
     return otpCode;
   }
 
+  public async createManager(
+    companyId: string,
+    newManagerDto: CreateManagerDto,
+  ): Promise<void> {
+    // check that roles are valid
+    if (
+      !['lector', 'lector,writer'].includes(newManagerDto.roles.toLowerCase())
+    ) {
+      throw new BadRequestException('Roles are invalid');
+    }
+
+    await this.prisma.admin_account.create({
+      data: {
+        email: newManagerDto.email,
+        full_name: newManagerDto.full_name,
+        roles: newManagerDto.roles,
+        company_id: companyId,
+      },
+    });
+  }
+
   public async deleteOtp(accountId: string): Promise<void> {
     await this.prisma.admin_account.update({
       where: {
@@ -77,5 +100,21 @@ export class AdminAccountRepository {
       },
     });
     return otpCode;
+  }
+
+  public async findAllFromCompany(companyId: string): Promise<admin_account[]> {
+    return this.prisma.admin_account.findMany({
+      where: {
+        company_id: companyId,
+      },
+    });
+  }
+
+  public async delete(accountId: string): Promise<void> {
+    await this.prisma.admin_account.delete({
+      where: {
+        id: accountId,
+      },
+    });
   }
 }

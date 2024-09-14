@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Logger,
   Post,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,7 +26,10 @@ import { RoleRestricted } from '@decorators/role-restricted.decorator';
 import { CampaignPricingService } from '@services/campaign/campaign-pricing.service';
 import { CampaignCalculateResponseDto } from '@dto/campaign/campaign-calculate-response.dto';
 import { CampaignCalculateRequestDto } from '@dto/campaign/campaign-calculate-request.dto';
-import { NewCampaignDto } from '@dto/campaign/new-campaign.dto';
+import {
+  NewCampaignDto,
+  updateCampaignDto,
+} from '@dto/campaign/new-campaign.dto';
 import { CampaignCheckoutDto } from '@dto/campaign/campaign-checkout.dto';
 import { GenericResponseDto } from '@dto/generic-response.dto';
 
@@ -118,6 +123,23 @@ export class CampaignController {
     this.logger.log(`Handling create campaign, body=${JSON.stringify(body)}`);
     return this.campaignService.create(headers, body);
   }
+  @RoleRestricted()
+  @Patch('/')
+  @ApiOperation({
+    summary: 'Update a campaign (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: CampaignDto })
+  @ApiResponse({
+    status: 400,
+    description: 'Body request is not correct',
+  })
+  public async update(
+    @Headers() headers: Headers,
+    @Body() body: updateCampaignDto,
+  ): Promise<CampaignDto> {
+    this.logger.log(`Handling update campaign, body=${JSON.stringify(body)}`);
+    return this.campaignService.updateCampaign(headers, body);
+  }
 
   @RoleRestricted()
   @Get('/create-checkout')
@@ -150,6 +172,22 @@ export class CampaignController {
     );
     return this.campaignPricingService
       .validateCheckout(headers, paymentStripeId)
+      .then(() => GenericResponseDto.ok());
+  }
+
+  @RoleRestricted()
+  @Delete('/delete')
+  @ApiOperation({
+    summary: 'Delete one campaign by ID (only writers role)',
+  })
+  @ApiResponse({ status: 200, type: GenericResponseDto })
+  public async deleteCampaign(
+    @Headers() headers: Headers,
+    @Query('id') id: string,
+  ): Promise<GenericResponseDto> {
+    this.logger.log(`Handling delete campaign, id=${id}`);
+    return this.campaignService
+      .deleteCampaign(headers, id)
       .then(() => GenericResponseDto.ok());
   }
 }
