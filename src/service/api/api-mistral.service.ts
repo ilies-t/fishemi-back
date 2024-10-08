@@ -44,9 +44,9 @@ export class ApiMistralService {
               (ne mets pas de sujet, ne mets pas de signature, ne mets pas de lien ou de mailto, juste le texte) 
               qui invite un employé de l'entreprise "${company.name}" à changer son mot de passe.
               Tu peux utiliser les variables dynamiques suivantes:
-              {{employeName}}: Nom de l’employé
+              {{employeeName}}: Nom de l’employé
               {{boutton}}: Bouton qui redirige sur le formulaire de connexion
-              {{employeEmail}}: Adresse mail de l’employé
+              {{employeeEmail}}: Adresse mail de l’employé
               `,
             },
           ],
